@@ -20,6 +20,7 @@ model User {
   profilePictureUrl     String?
   messagesSent          Message[]
   chats                 Chat[]
+  tokens                Token[]
 }
 
 model Message {
@@ -38,4 +39,14 @@ model Chat {
   name                  String
   participants          User[]
   messages              Message[]
+}
+
+model Token {
+  id          Int          @id @default(autoincrement())
+  userId      Int          
+  token       String       @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires_at  DateTime     
+  created_at  DateTime     @default(now())
+  revoked     Boolean      @default(false)
 }
