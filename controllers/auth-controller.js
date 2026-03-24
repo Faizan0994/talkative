@@ -27,6 +27,10 @@ const validator = [
     .withMessage("Password must be at least 8 characters long")
     .custom((value, { req }) => value === req.body.password)
     .withMessage("Passwords do not match"),
+  body("profilePictureUrl")
+    .trim()
+    .isURL()
+    .withMessage("Invalid profile picture URL"),
 ];
 
 const loginValidator = [
