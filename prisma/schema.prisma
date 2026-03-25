@@ -37,6 +37,7 @@ model Message {
 model Chat {
   id                    Int                @id @default(autoincrement())
   name                  String?
+  isGroup               Boolean            @default(false)
   participants          User[]
   messages              Message[]
 }
