@@ -36,7 +36,7 @@ model Message {
 
 model Chat {
   id                    Int                @id @default(autoincrement())
-  name                  String
+  name                  String?
   participants          User[]
   messages              Message[]
 }
