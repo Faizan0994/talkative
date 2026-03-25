@@ -61,7 +61,7 @@ exports.updateUser = [
     if (!errors.isEmpty()) {
       //TODO: Test this
       errors = errors.array().map((err) => {
-        return { msg: err.msg };
+        return err.msg;
       });
       return res.status(400).json({ errors: errors });
     }
