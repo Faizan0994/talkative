@@ -63,9 +63,12 @@ exports.getChat = [
   async (req, res) => {
     const user = req.user;
     const id = +req.params.id;
+    const limit = +req.query.limit;
 
     try {
-      const chat = await queries.getChat(id);
+      const chat = limit
+        ? await queries.getChat(id, limit)
+        : await queries.getChat(id);
       if (!chat) return res.sendStatus(404);
 
       // Check if user is a participant in the chat
@@ -74,6 +77,59 @@ exports.getChat = [
       return res.status(200).json({ chat });
     } catch (err) {
       return res.status(500).json({ errors: ["Error retrieving chat"] });
+    }
+  },
+];
+
+exports.markChatRead = [
+  verifyToken,
+  async (req, res) => {
+    const user = req.user;
+    const id = +req.params.id;
+
+    try {
+      const chat = await queries.getChat(id);
+      if (!chat) return res.sendStatus(404);
+
+      // Check if user is a participant in the chat
+      const isParticipant = chat.participants.some((p) => p.id === user.id);
+      if (!isParticipant) return res.sendStatus(403); // Users can only access their own chats
+
+      await queries.markChatAsRead(id, user.id);
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.status(500).json({ errors: ["Error marking chat as read"] });
+    }
+  },
+];
+
+exports.getUnreadCount = [
+  verifyToken,
+  async (req, res) => {
+    const user = req.user;
+    const id = +req.params.id;
+
+    try {
+      const unreadCount = await queries.unreadMessagesCount(id, user.id);
+      return res.status(200).json({ unreadCount });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ errors: ["Error retrieving unread count"] });
+    }
+  },
+];
+
+exports.leaveChat = [
+  verifyToken,
+  async (req, res) => {
+    const user = req.user;
+    const id = +req.params.id;
+    try {
+      await queries.removeChatParticipant(id, user.id);
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.status(500).json({ errors: ["Error leaving chat"] });
     }
   },
 ];

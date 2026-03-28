@@ -3,6 +3,7 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/users");
 const chatRouter = require("./routes/chats");
+const messageRouter = require("./routes/messages");
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -14,6 +15,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/chats", chatRouter);
+app.use("/api/messages", messageRouter);
 
 app.listen(process.env.PORT || 3000, (error) => {
   console.log("server listening...");
