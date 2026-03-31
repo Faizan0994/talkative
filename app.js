@@ -17,9 +17,4 @@ app.use("/api/users", userRouter);
 app.use("/api/chats", chatRouter);
 app.use("/api/messages", messageRouter);
 
-app.listen(process.env.PORT || 3000, (error) => {
-  console.log("server listening...");
-  if (error) {
-    console.log(error);
-  }
-});
+module.exports = app;
