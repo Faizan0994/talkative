@@ -1,0 +1,9 @@
+// Test setup file
+// Mock environment variables for testing
+process.env.ACCESS_SECRET =
+  "4ed30fd05df9859ba4dc16d719d88b25542582fe8aa3eb7d3113c0dc8662d8b133abd80c8fd4b83180a9d6b3cbd6e715289fbdf2348ab7b6eba584d88b491df0";
+process.env.REFRESH_SECRET =
+  "3207aa4096220bc8ae8f3f3878a6401d6fe7c6ba30ddb9f2fea1cce3ef5d2c104c65eb67c3f4dbbbec36e440b75810667680aed6247e46d3374135833d274c4a";
+process.env.REFRESH_HASH_SECRET =
+  "3086d761af65f6febfa3a755856e98997252cdf0e7e29a344f32becfab2383475928f13ac6192ef82262ba3babb4176e22b23381c68eb02098ef433d38cfb87b";
+process.env.NODE_ENV = "test";
