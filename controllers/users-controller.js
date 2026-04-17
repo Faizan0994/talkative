@@ -70,7 +70,14 @@ exports.updateUser = [
 
     await queries.updateUser(user.id, name, username, profilePictureUrl);
 
-    return res.sendStatus(200);
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        name,
+        username,
+        profilePictureUrl,
+      },
+    });
   },
 ];
 
