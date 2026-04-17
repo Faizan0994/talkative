@@ -175,7 +175,8 @@ exports.updateChatName = [
       if (!isParticipant) return res.sendStatus(403);
 
       await queries.updateChatName(id, name);
-      return res.sendStatus(200);
+      chat.name = name;
+      return res.status(200).json({ chat });
     } catch (err) {
       return res.status(500).json({ errors: ["Error updating chat name"] });
     }
