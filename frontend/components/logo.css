@@ -1,0 +1,12 @@
+.talkative-logo > h1 {
+  color: #2b6cb0;
+  font-size: 1em;
+  letter-spacing: -2%;
+  flex: 1;
+}
+
+.talkative-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

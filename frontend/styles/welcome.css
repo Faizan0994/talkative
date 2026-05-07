@@ -1,0 +1,50 @@
+.welcome-block {
+  width: 80vw;
+  height: 80vh;
+  background-color: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4vh;
+  align-items: center;
+}
+
+.welcome-block > .talkative-logo {
+  font-size: 16vw;
+}
+
+.welcome-block > svg {
+  width: 12vw;
+  fill: #4779af;
+  height: auto;
+  animation: loading 1s linear infinite;
+}
+
+.welcome-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f4f8;
+}
+
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 768px) {
+  .welcome-block > .talkative-logo {
+    font-size: 8vw;
+  }
+
+  .welcome-block > svg {
+    width: 5vw;
+  }
+}
