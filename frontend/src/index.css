@@ -30,4 +30,13 @@ body {
     "Open Sans",
     "Helvetica Neue",
     sans-serif;
+
+  --background-1: #ebf8ff;
+  --background-2: #f0f4f8;
+  --primary-color: #2b6cb0;
+  --accent-color: #1a365d;
+}
+
+button:hover {
+  cursor: pointer;
 }
