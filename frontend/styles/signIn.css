@@ -1,0 +1,143 @@
+.signin-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-1);
+}
+
+.signin-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 76vw;
+  max-height: 116vw;
+  padding: 4vw;
+  gap: 3dvh;
+  background-color: var(--background-2);
+  border-radius: 2dvh;
+  box-shadow: 0px 0px 12px 1px rgb(192, 192, 192);
+  flex: 1;
+}
+
+.signin-block > .talkative-logo {
+  font-size: 5dvh;
+  text-align: center;
+}
+
+.signin-block .form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.signin-block label {
+  font-size: 1.6dvh;
+  padding-left: 2%;
+  color: rgb(58, 57, 57);
+}
+
+.signin-block input {
+  appearance: none;
+  height: 4dvh;
+  border-radius: 8px;
+  border: 1px solid gray;
+  padding-left: 4%;
+}
+
+.signin-block > form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 80%;
+  gap: 3dvh;
+}
+
+.signin-block p {
+  text-align: center;
+}
+
+.signin-block .line {
+  display: flex;
+  justify-content: center;
+  gap: 2dvh;
+  align-items: center;
+  text-align: center;
+}
+
+.signin-block .line::before,
+.signin-block .line::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid black;
+}
+
+.signin-block button {
+  border: none;
+  background-color: var(--primary-color);
+  /* padding: 1dvh 1.7dvh; */
+  border-radius: 1dvh;
+  font-size: 2dvh;
+  height: 4dvh;
+  font-weight: bold;
+  color: white;
+}
+
+.signin-block .button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5dvh;
+}
+
+.signin-block .button-wrapper > button {
+  width: 100%;
+}
+
+.signin-block .button-wrapper > p {
+  font-size: 1.5dvh;
+}
+
+.signin-block .errors {
+  font-size: 1.6dvh;
+  color: #b00000;
+  flex: 0;
+}
+
+.signin-block button.inactive {
+  background-color: var(--accent-color);
+  color: grey;
+}
+
+@media screen and (min-width: 768px) {
+  .signin-block {
+    max-width: 20vw;
+    padding: 2vw;
+  }
+
+  .signin-block > .talkative-logo {
+    font-size: 4vw;
+  }
+
+  .signin-block form {
+  }
+
+  .signin-block .form-row {
+    max-width: none;
+    align-self: stretch;
+    padding: 0 10%;
+    flex: 1;
+  }
+
+  .signin-block input {
+    height: 2vw;
+  }
+
+  .signin-block label {
+    font-size: 1vw;
+  }
+
+  .signin-block button {
+    font-size: 1.2vw;
+  }
+}
