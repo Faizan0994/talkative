@@ -125,12 +125,13 @@
   .signin-block .form-row {
     max-width: none;
     align-self: stretch;
-    padding: 0 10%;
+    /* padding: 0 10%; */
     flex: 1;
   }
 
   .signin-block input {
     height: 2vw;
+    padding: 0 10%;
   }
 
   .signin-block label {
