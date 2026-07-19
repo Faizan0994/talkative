@@ -49,8 +49,14 @@ function SignIn() {
           <div className="line">
             <span>or</span>
           </div>
-          <input type="text" name="username" value="guest" hidden />
-          <input type="password" name="password" value="guestpassword" hidden />
+          <input type="text" name="username" value="guest" hidden readOnly />
+          <input
+            type="password"
+            name="password"
+            value="guestpassword"
+            hidden
+            readOnly
+          />
           <button type="submit" className={loading ? "inactive" : ""}>
             Continue as Guest
           </button>
