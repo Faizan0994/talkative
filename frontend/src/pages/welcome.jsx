@@ -10,12 +10,6 @@ function WelcomeScreen() {
     let response;
     const baseUrl = import.meta.env.VITE_SERVER_URL;
     async function timeOut() {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          console.log("Loading Timeout complete!");
-          resolve();
-        }, 2000);
-      });
       response = await fetch(`${baseUrl}/health`);
       console.log(response);
       if (response.status === 200) {

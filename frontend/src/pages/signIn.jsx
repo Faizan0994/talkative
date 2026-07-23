@@ -1,15 +1,32 @@
 import "../styles/signIn.css";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import Logo from "../components/logo";
+import { useAuth } from "../context/AuthContext";
 
 function SignIn() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { login, error, clearError } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    //TODO: implement logic
+    clearError();
+    const formData = new FormData(e.target);
+    const username = formData.get("username");
+    const password = formData.get("password");
+    if (!username || !password) return;
+
+    setLoading(true);
+    try {
+      await login(username, password);
+      navigate("/");
+    } catch {
+      // error is set by AuthContext
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -19,7 +36,7 @@ function SignIn() {
         <form onSubmit={handleSubmit}>
           {error && (
             <div className="errors">
-              <p>Incorrect username or password</p>
+              <p>{error}</p>
             </div>
           )}
           <div className="form-row">
@@ -40,8 +57,7 @@ function SignIn() {
               Sign In
             </button>
             <p>
-              Don't have an account? <a href="/signup">Sign Up</a>{" "}
-              {/* replace with <Link></Link> */}
+              Don't have an account? <Link to="/signup">Sign Up</Link>
             </p>
           </div>
         </form>
