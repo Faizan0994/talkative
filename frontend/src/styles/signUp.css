@@ -1,4 +1,4 @@
-.signin-page {
+.signup-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   background-color: var(--background-1);
 }
 
-.signin-block {
+.signup-block {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,23 +21,23 @@
   flex: 1;
 }
 
-.signin-block > .talkative-logo {
+.signup-block > .talkative-logo {
   font-size: 5dvh;
   text-align: center;
 }
 
-.signin-block .form-row {
+.signup-block .form-row {
   display: flex;
   flex-direction: column;
 }
 
-.signin-block label {
+.signup-block label {
   font-size: 1.6dvh;
   padding-left: 2%;
   color: rgb(58, 57, 57);
 }
 
-.signin-block input {
+.signup-block input {
   appearance: none;
   height: 4dvh;
   border-radius: 8px;
@@ -45,7 +45,7 @@
   padding-left: 4%;
 }
 
-.signin-block > form {
+.signup-block > form {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -53,11 +53,11 @@
   gap: 3dvh;
 }
 
-.signin-block p {
+.signup-block p {
   text-align: center;
 }
 
-.signin-block .line {
+.signup-block .line {
   display: flex;
   justify-content: center;
   gap: 2dvh;
@@ -65,17 +65,16 @@
   text-align: center;
 }
 
-.signin-block .line::before,
-.signin-block .line::after {
+.signup-block .line::before,
+.signup-block .line::after {
   content: "";
   flex: 1;
   border-bottom: 1px solid black;
 }
 
-.signin-block button {
+.signup-block button {
   border: none;
   background-color: var(--primary-color);
-  /* padding: 1dvh 1.7dvh; */
   border-radius: 1dvh;
   font-size: 2dvh;
   height: 4dvh;
@@ -83,59 +82,58 @@
   color: white;
 }
 
-.signin-block .button-wrapper {
+.signup-block .button-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5dvh;
 }
 
-.signin-block .button-wrapper > button {
+.signup-block .button-wrapper > button {
   width: 100%;
 }
 
-.signin-block .button-wrapper > p {
+.signup-block .button-wrapper > p {
   font-size: 1.5dvh;
 }
 
-.signin-block .errors {
+.signup-block .errors {
   font-size: 1.6dvh;
   color: #b00000;
   flex: 0;
 }
 
-.signin-block button.inactive {
+.signup-block button.inactive {
   background-color: var(--accent-color);
   color: grey;
 }
 
 @media screen and (min-width: 768px) {
-  .signin-block {
+  .signup-block {
     max-width: 20vw;
     padding: 2vw;
   }
 
-  .signin-block > .talkative-logo {
+  .signup-block > .talkative-logo {
     font-size: 4vw;
   }
 
-  .signin-block .form-row {
+  .signup-block .form-row {
     max-width: none;
     align-self: stretch;
-    /* padding: 0 10%; */
     flex: 1;
   }
 
-  .signin-block input {
+  .signup-block input {
     height: 2vw;
     padding: 0 10%;
   }
 
-  .signin-block label {
+  .signup-block label {
     font-size: 1vw;
   }
 
-  .signin-block button {
+  .signup-block button {
     font-size: 1.2vw;
   }
 }

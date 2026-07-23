@@ -1,27 +1,35 @@
-import "../styles/signIn.css";
+import "../styles/signUp.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import Logo from "../components/logo";
 import { useAuth } from "../context/AuthContext";
 
-function SignIn() {
+function SignUp() {
   const [loading, setLoading] = useState(false);
-  const { login, error, clearError } = useAuth();
+  const { signup, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
     const formData = new FormData(e.target);
+    const name = formData.get("name");
     const username = formData.get("username");
     const password = formData.get("password");
-    if (!username || !password) return;
+    const confirm = formData.get("confirm");
+    if (!name || !username || !password || !confirm) return;
 
     setLoading(true);
     try {
-      await login(username, password);
-      navigate("/dashboard");
+      await signup({
+        name,
+        username,
+        password,
+        confirm,
+        profilePictureUrl: "https://example.com/placeholder.png",
+      });
+      navigate("/signin");
     } catch {
       // error is set by AuthContext
     } finally {
@@ -30,8 +38,8 @@ function SignIn() {
   };
 
   return (
-    <div className="signin-page">
-      <div className="signin-block">
+    <div className="signup-page">
+      <div className="signup-block">
         <Logo />
         <form onSubmit={handleSubmit}>
           {error && (
@@ -40,46 +48,43 @@ function SignIn() {
             </div>
           )}
           <div className="form-row">
+            <label htmlFor="name">Name: </label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div className="form-row">
             <label htmlFor="username">Username: </label>
-            <input type="text" id="username-login" name="username" required />
+            <input type="text" id="username" name="username" required />
           </div>
           <div className="form-row">
             <label htmlFor="password">Password:</label>
             <input
               type="password"
-              id="password-login"
+              id="password"
               name="password"
+              required
+            />
+          </div>
+          <div className="form-row">
+            <label htmlFor="confirm">Confirm Password:</label>
+            <input
+              type="password"
+              id="confirm"
+              name="confirm"
               required
             />
           </div>
           <div className="button-wrapper">
             <button type="submit" className={loading ? "inactive" : ""}>
-              Sign In
+              Sign Up
             </button>
             <p>
-              Don't have an account? <Link to="/signup">Sign Up</Link>
+              Already have an account? <Link to="/signin">Sign In</Link>
             </p>
           </div>
-        </form>
-        <form onSubmit={handleSubmit}>
-          <div className="line">
-            <span>or</span>
-          </div>
-          <input type="text" name="username" value="guest" hidden readOnly />
-          <input
-            type="password"
-            name="password"
-            value="guestpassword"
-            hidden
-            readOnly
-          />
-          <button type="submit" className={loading ? "inactive" : ""}>
-            Continue as Guest
-          </button>
         </form>
       </div>
     </div>
   );
 }
 
-export default SignIn;
+export default SignUp;

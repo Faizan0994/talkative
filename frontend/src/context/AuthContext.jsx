@@ -69,18 +69,27 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (username, password) => {
     setError("");
-    const res = await fetch(`${baseUrl}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include",
-    });
+    let res;
+    try {
+      res = await fetch(`${baseUrl}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include",
+      });
+    } catch {
+      const msg = "Unable to connect to server. Please check your connection.";
+      setError(msg);
+      throw new Error(msg);
+    }
+
     const data = await res.json();
     if (!res.ok) {
       const msg = data.errors?.[0] || "Login failed";
       setError(msg);
       throw new Error(msg);
     }
+
     localStorage.setItem(TOKEN_KEY, data.token);
     const payload = parseJwt(data.token);
     setToken(data.token);
@@ -89,17 +98,26 @@ export function AuthProvider({ children }) {
 
   const signup = useCallback(async (userData) => {
     setError("");
-    const res = await fetch(`${baseUrl}/api/auth/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
+    let res;
+    try {
+      res = await fetch(`${baseUrl}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+    } catch {
+      const msg = "Unable to connect to server. Please check your connection.";
+      setError(msg);
+      throw new Error(msg);
+    }
+
     const data = await res.json();
     if (!res.ok) {
       const msg = data.errors?.[0] || "Signup failed";
       setError(msg);
       throw new Error(msg);
     }
+
     return data;
   }, []);
 
