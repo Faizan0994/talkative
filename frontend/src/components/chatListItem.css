@@ -1,0 +1,134 @@
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 3dvw;
+  padding: 1.5dvh 0;
+  cursor: pointer;
+  border-radius: 1.5dvh;
+  transition: background-color 0.15s ease;
+}
+
+.chat-list-item:hover {
+  background-color: var(--background-1);
+}
+
+.chat-list-item--active {
+  background-color: var(--background-1);
+}
+
+.chat-list-item-avatar {
+  width: 5dvh;
+  height: 5dvh;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 2dvh;
+  flex-shrink: 0;
+}
+
+.chat-list-item-avatar--group {
+  background-color: var(--accent-color);
+}
+
+.chat-list-item-group-icon {
+  width: 60%;
+  height: 60%;
+}
+
+.chat-list-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4dvh;
+}
+
+.chat-list-item-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1dvw;
+}
+
+.chat-list-item-name {
+  font-size: 2dvh;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.chat-list-item-time {
+  font-size: 1.5dvh;
+  color: gray;
+  flex-shrink: 0;
+}
+
+.chat-list-item-preview {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.7dvh;
+  color: gray;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-list-item--active .chat-list-item-preview,
+.chat-list-item--active .chat-list-item-time {
+  color: var(--primary-color);
+}
+
+.chat-list-item-badge {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 1dvh;
+  padding: 0.3dvh 1dvh;
+  font-size: 1.4dvh;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 2dvh;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .chat-list-item {
+    gap: 1vw;
+    padding: 1dvh 0;
+    border-radius: 0.8vw;
+  }
+
+  .chat-list-item-avatar {
+    width: 3vw;
+    height: 3vw;
+    font-size: 1.2vw;
+  }
+
+  .chat-list-item-body {
+    gap: 0.2vw;
+  }
+
+  .chat-list-item-name {
+    font-size: 1.2vw;
+  }
+
+  .chat-list-item-time {
+    font-size: 0.85vw;
+  }
+
+  .chat-list-item-preview {
+    font-size: 1vw;
+  }
+
+  .chat-list-item-badge {
+    font-size: 0.8vw;
+    padding: 0.15vw 0.5vw;
+    border-radius: 0.5vw;
+    min-width: 1vw;
+  }
+}

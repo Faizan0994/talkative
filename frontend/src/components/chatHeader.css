@@ -1,0 +1,54 @@
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1dvh 4dvw 0.3dvh;
+  /* border-bottom: 1px solid lightgray; */
+}
+
+.chat-header > .talkative-logo {
+  font-size: 4dvh;
+}
+
+.chat-header-logout,
+.chat-header-settings {
+  background: none;
+  border: none;
+  width: 3dvh;
+  height: 3dvh;
+  cursor: pointer;
+  padding: 0;
+}
+
+.chat-header-logout svg,
+.chat-header-settings svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--primary-color);
+}
+
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2dvw;
+}
+
+@media (min-width: 768px) {
+  .chat-header {
+    padding: 2dvh 1.5vw;
+  }
+
+  .chat-header > .talkative-logo {
+    font-size: 2vw;
+  }
+
+  .chat-header-actions {
+    gap: 1vw;
+  }
+
+  .chat-header-logout,
+  .chat-header-settings {
+    width: 2vw;
+    height: 2vw;
+  }
+}
