@@ -75,6 +75,7 @@
   .chat-list {
     gap: 1.5dvh;
     overflow: hidden;
+    width: 100%;
   }
 
   .chat-list-section {
