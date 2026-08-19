@@ -17,7 +17,14 @@ function formatDate(timestamp) {
   });
 }
 
-function MessageList({ messages, currentUserId, isGroup, isTyping, emptyMessage }) {
+function MessageList({
+  messages,
+  currentUserId,
+  isGroup,
+  isTyping,
+  emptyMessage,
+  onDelete,
+}) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -57,6 +64,7 @@ function MessageList({ messages, currentUserId, isGroup, isTyping, emptyMessage 
         isOwn={isOwn}
         isGroup={isGroup}
         showSenderName={showSenderName}
+        onDelete={onDelete}
       />,
     );
   });

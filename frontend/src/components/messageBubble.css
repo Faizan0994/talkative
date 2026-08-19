@@ -1,5 +1,22 @@
 .message-bubble-row {
   display: flex;
+  position: relative;
+}
+
+.message-bubble-dismiss {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+}
+
+.message-bubble-row--own .confirm-popover {
+  top: -1dvh;
+  right: 0;
+}
+
+.message-bubble-row--incoming .confirm-popover {
+  top: -1dvh;
+  left: 0;
 }
 
 .message-bubble-row--incoming {

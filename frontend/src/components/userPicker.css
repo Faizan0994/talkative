@@ -1,0 +1,156 @@
+.user-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5dvh;
+}
+
+.user-picker-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2dvw;
+  background-color: white;
+  border: 1px solid gray;
+  border-radius: 1dvh;
+  padding: 1dvh 3dvw;
+}
+
+.user-picker-search-icon {
+  width: 2dvh;
+  height: 2dvh;
+  fill: gray;
+  flex-shrink: 0;
+}
+
+.user-picker-search-wrapper input {
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1.8dvh;
+  width: 100%;
+}
+
+.user-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+}
+
+.user-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 2dvw;
+  padding: 1dvh 2dvw;
+  border-radius: 1dvh;
+  background-color: white;
+  cursor: pointer;
+}
+
+.user-picker-item--selected {
+  background-color: var(--background-1);
+  border: 1px solid var(--primary-color);
+}
+
+.user-picker-avatar {
+  width: 4dvh;
+  height: 4dvh;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.8dvh;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.user-picker-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-picker-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-picker-item-name {
+  font-size: 1.8dvh;
+  font-weight: bold;
+  color: var(--accent-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-picker-item-username {
+  font-size: 1.4dvh;
+  color: gray;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-picker-check {
+  width: 2.5dvh;
+  height: 2.5dvh;
+  fill: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.user-picker-empty {
+  text-align: center;
+  font-size: 1.6dvh;
+  color: gray;
+  padding: 2dvh 0;
+}
+
+@media (min-width: 768px) {
+  .user-picker-search-wrapper {
+    gap: 0.8vw;
+    border-radius: 0.5vw;
+    padding: 0.5vw 1vw;
+  }
+
+  .user-picker-search-icon {
+    width: 1vw;
+    height: 1vw;
+  }
+
+  .user-picker-search-wrapper input {
+    font-size: 0.95vw;
+  }
+
+  .user-picker-item {
+    gap: 0.8vw;
+    padding: 0.5vw 0.8vw;
+    border-radius: 0.5vw;
+  }
+
+  .user-picker-avatar {
+    width: 2.2vw;
+    height: 2.2vw;
+    font-size: 1vw;
+  }
+
+  .user-picker-item-name {
+    font-size: 1vw;
+  }
+
+  .user-picker-item-username {
+    font-size: 0.8vw;
+  }
+
+  .user-picker-check {
+    width: 1.3vw;
+    height: 1.3vw;
+  }
+
+  .user-picker-empty {
+    font-size: 0.9vw;
+  }
+}

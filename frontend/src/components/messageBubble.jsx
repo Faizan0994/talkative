@@ -1,4 +1,8 @@
+import { useRef, useState } from "react";
+import ConfirmPopover from "./confirmPopover";
 import "./messageBubble.css";
+
+const LONG_PRESS_MS = 500;
 
 function formatTime(timestamp) {
   if (!timestamp) return "";
@@ -6,13 +10,52 @@ function formatTime(timestamp) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function MessageBubble({ message, isOwn, showSenderName, isGroup }) {
+function MessageBubble({ message, isOwn, showSenderName, isGroup, onDelete }) {
+  const [confirming, setConfirming] = useState(false);
+  const pressTimer = useRef(null);
+
+  const startPress = () => {
+    if (!isOwn || confirming) return;
+    pressTimer.current = setTimeout(() => setConfirming(true), LONG_PRESS_MS);
+  };
+
+  const cancelPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  const handleConfirm = () => {
+    setConfirming(false);
+    onDelete?.(message.id);
+  };
+
   return (
     <div
       className={`message-bubble-row ${
         isOwn ? "message-bubble-row--own" : "message-bubble-row--incoming"
       }`}
+      onPointerDown={startPress}
+      onPointerUp={cancelPress}
+      onPointerLeave={cancelPress}
+      onPointerCancel={cancelPress}
+      onContextMenu={(e) => {
+        if (isOwn) e.preventDefault();
+      }}
     >
+      {confirming && (
+        <>
+          <div
+            className="message-bubble-dismiss"
+            onClick={() => setConfirming(false)}
+          />
+          <ConfirmPopover
+            onConfirm={handleConfirm}
+            onCancel={() => setConfirming(false)}
+          />
+        </>
+      )}
       <div className="message-bubble-wrapper">
         {showSenderName && isGroup && !isOwn && (
           <div className="message-bubble-sender">{message.sender?.name}</div>

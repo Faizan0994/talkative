@@ -3,9 +3,30 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router";
 import ChatList from "../components/chatList";
 import ChatScreen from "./chatScreen";
+import NewChatModal from "../components/newChatModal";
+import ChatInfoModal from "../components/chatInfoModal";
 import "../styles/dashboard.css";
 
 const CURRENT_USER_ID = 99;
+
+const CURRENT_USER = {
+  id: CURRENT_USER_ID,
+  name: "You",
+  username: "you",
+};
+
+const PLACEHOLDER_USERS = [
+  { id: 1, name: "Alice", username: "alice" },
+  { id: 2, name: "Bob", username: "bob" },
+  { id: 3, name: "Carol", username: "carol" },
+  { id: 4, name: "Dave", username: "dave" },
+  { id: 5, name: "Frank", username: "frank" },
+  { id: 6, name: "Grace", username: "grace" },
+  { id: 7, name: "Hank", username: "hank" },
+  { id: 8, name: "Ivy", username: "ivy" },
+  { id: 9, name: "Jack", username: "jack" },
+  { id: 11, name: "Elena", username: "elena" },
+];
 
 const PLACEHOLDER_CHATS = [
   {
@@ -15,6 +36,10 @@ const PLACEHOLDER_CHATS = [
     lastMessage: "See you at the meeting!",
     lastMessageAt: "2026-08-05T12:30:00",
     unreadCount: 2,
+    participants: [
+      { id: 1, name: "Alice", username: "alice" },
+      CURRENT_USER,
+    ],
   },
   {
     id: 2,
@@ -23,6 +48,10 @@ const PLACEHOLDER_CHATS = [
     lastMessage: "Sent the report over, let me know what you think.",
     lastMessageAt: "2026-08-04T18:05:00",
     unreadCount: 0,
+    participants: [
+      { id: 2, name: "Bob", username: "bob" },
+      CURRENT_USER,
+    ],
   },
   {
     id: 3,
@@ -31,6 +60,12 @@ const PLACEHOLDER_CHATS = [
     lastMessage: "Elena: Sprint review is at 2pm.",
     lastMessageAt: "2026-08-05T09:15:00",
     unreadCount: 7,
+    participants: [
+      { id: 11, name: "Elena", username: "elena" },
+      { id: 1, name: "Alice", username: "alice" },
+      { id: 2, name: "Bob", username: "bob" },
+      CURRENT_USER,
+    ],
   },
   {
     id: 4,
@@ -39,6 +74,11 @@ const PLACEHOLDER_CHATS = [
     lastMessage: null,
     lastMessageAt: null,
     unreadCount: 0,
+    participants: [
+      { id: 3, name: "Carol", username: "carol" },
+      { id: 4, name: "Dave", username: "dave" },
+      CURRENT_USER,
+    ],
   },
 ];
 
@@ -141,8 +181,10 @@ const PLACEHOLDER_MESSAGES = {
 };
 
 function Dashboard() {
-  const [chats] = useState(PLACEHOLDER_CHATS);
+  const [chats, setChats] = useState(PLACEHOLDER_CHATS);
   const [messagesByChat, setMessagesByChat] = useState(PLACEHOLDER_MESSAGES);
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [showChatInfo, setShowChatInfo] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { chatId } = useParams();
@@ -185,10 +227,105 @@ function Dashboard() {
   };
 
   const handleSettings = () => {
-    // TODO: open settings
+    navigate("/settings");
+  };
+
+  const handleStartChat = (userId) => {
+    const user = PLACEHOLDER_USERS.find((u) => u.id === userId);
+    if (!user) return;
+
+    const existing = chats.find(
+      (c) =>
+        !c.isGroup &&
+        c.participants &&
+        c.participants.some((p) => p.id === userId),
+    );
+    if (existing) {
+      navigate(`/dashboard/${existing.id}`);
+      return;
+    }
+
+    const id = Date.now();
+    const newChat = {
+      id,
+      name: user.name,
+      isGroup: false,
+      lastMessage: null,
+      lastMessageAt: null,
+      unreadCount: 0,
+      participants: [user, CURRENT_USER],
+    };
+    setChats((prev) => [newChat, ...prev]);
+    setMessagesByChat((prev) => ({ ...prev, [id]: [] }));
+    navigate(`/dashboard/${id}`);
+  };
+
+  const handleCreateGroup = (name, userIds) => {
+    const members = userIds
+      .map((id) => PLACEHOLDER_USERS.find((u) => u.id === id))
+      .filter(Boolean);
+
+    const id = Date.now();
+    const newChat = {
+      id,
+      name,
+      isGroup: true,
+      lastMessage: null,
+      lastMessageAt: null,
+      unreadCount: 0,
+      participants: [...members, CURRENT_USER],
+    };
+    setChats((prev) => [newChat, ...prev]);
+    setMessagesByChat((prev) => ({ ...prev, [id]: [] }));
+    navigate(`/dashboard/${id}`);
+  };
+
+  const handleRenameChat = (name) => {
+    if (!selectedChatId) return;
+    setChats((prev) =>
+      prev.map((c) => (c.id === selectedChatId ? { ...c, name } : c)),
+    );
+  };
+
+  const handleAddParticipants = (userIds) => {
+    if (!selectedChatId) return;
+    const newMembers = userIds
+      .map((id) => PLACEHOLDER_USERS.find((u) => u.id === id))
+      .filter(Boolean);
+    setChats((prev) =>
+      prev.map((c) =>
+        c.id === selectedChatId
+          ? { ...c, participants: [...c.participants, ...newMembers] }
+          : c,
+      ),
+    );
+  };
+
+  const handleLeaveChat = () => {
+    if (!selectedChatId) return;
+    setChats((prev) => prev.filter((c) => c.id !== selectedChatId));
+    setMessagesByChat((prev) => {
+      const next = { ...prev };
+      delete next[selectedChatId];
+      return next;
+    });
+    setShowChatInfo(false);
+    navigate("/dashboard");
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    if (!selectedChatId) return;
+    const id = selectedChatId;
+    setMessagesByChat((prev) => ({
+      ...prev,
+      [id]: (prev[id] || []).filter((m) => m.id !== messageId),
+    }));
   };
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
+  const visibleMessages = (messagesByChat[selectedChatId] || []).map((m) =>
+    m.senderId === CURRENT_USER_ID ? { ...m, read: true } : m,
+  );
 
   return (
     <div className="dashboard">
@@ -201,6 +338,7 @@ function Dashboard() {
           onSelectChat={handleSelectChat}
           onLogout={handleLogout}
           onSettings={handleSettings}
+          onNewChat={() => setShowNewChat(true)}
         />
       </div>
       <div
@@ -209,10 +347,12 @@ function Dashboard() {
         {selectedChat ? (
           <ChatScreen
             chat={selectedChat}
-            messages={messagesByChat[selectedChat.id] || []}
+            messages={visibleMessages}
             currentUserId={CURRENT_USER_ID}
             onBack={handleBack}
             onSend={handleSend}
+            onDelete={handleDeleteMessage}
+            onOpenInfo={() => setShowChatInfo(true)}
           />
         ) : (
           <div className="dashboard-placeholder">
@@ -220,6 +360,25 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      <NewChatModal
+        open={showNewChat}
+        onClose={() => setShowNewChat(false)}
+        users={PLACEHOLDER_USERS}
+        onStartChat={handleStartChat}
+        onCreateGroup={handleCreateGroup}
+      />
+
+      <ChatInfoModal
+        open={showChatInfo}
+        onClose={() => setShowChatInfo(false)}
+        chat={selectedChat}
+        users={PLACEHOLDER_USERS}
+        currentUserId={CURRENT_USER_ID}
+        onRenameChat={handleRenameChat}
+        onAddParticipants={handleAddParticipants}
+        onLeaveChat={handleLeaveChat}
+      />
     </div>
   );
 }

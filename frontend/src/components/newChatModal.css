@@ -1,0 +1,89 @@
+.new-chat {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-chat-tabs {
+  display: flex;
+  gap: 2dvw;
+  margin-bottom: 1.5dvh;
+}
+
+.new-chat-tab {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 1.8dvh;
+  font-weight: bold;
+  color: gray;
+  padding-bottom: 0.8dvh;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.new-chat-tab--active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.new-chat-group-name {
+  appearance: none;
+  height: 4dvh;
+  border-radius: 1dvh;
+  border: 1px solid gray;
+  padding-left: 3dvw;
+  font-size: 1.8dvh;
+  margin-bottom: 1.5dvh;
+  background-color: white;
+}
+
+.new-chat-submit {
+  margin-top: 2dvh;
+  align-self: flex-end;
+  border: none;
+  background-color: var(--primary-color);
+  border-radius: 1dvh;
+  font-size: 2dvh;
+  height: 4.5dvh;
+  padding: 0 5dvw;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+}
+
+.new-chat-submit:disabled {
+  background-color: var(--accent-color);
+  color: grey;
+  cursor: not-allowed;
+}
+
+@media (min-width: 768px) {
+  .new-chat-tabs {
+    gap: 1vw;
+    margin-bottom: 1vw;
+  }
+
+  .new-chat {
+    padding: 0 0.5dvw;
+  }
+
+  .new-chat-tab {
+    font-size: 1vw;
+  }
+
+  .new-chat-group-name {
+    height: 2.2vw;
+    border-radius: 0.5vw;
+    padding-left: 1vw;
+    font-size: 0.95vw;
+    margin-bottom: 1vw;
+  }
+
+  .new-chat-submit {
+    margin-top: 1vw;
+    border-radius: 0.5vw;
+    font-size: 1.1vw;
+    height: 2.5vw;
+    padding: 0 2vw;
+  }
+}

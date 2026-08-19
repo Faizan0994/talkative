@@ -11,7 +11,8 @@
 }
 
 .chat-header-logout,
-.chat-header-settings {
+.chat-header-settings,
+.chat-header-new-chat {
   background: none;
   border: none;
   width: 3dvh;
@@ -21,7 +22,8 @@
 }
 
 .chat-header-logout svg,
-.chat-header-settings svg {
+.chat-header-settings svg,
+.chat-header-new-chat svg {
   width: 100%;
   height: 100%;
   fill: var(--primary-color);
@@ -47,7 +49,8 @@
   }
 
   .chat-header-logout,
-  .chat-header-settings {
+  .chat-header-settings,
+  .chat-header-new-chat {
     width: 2vw;
     height: 2vw;
   }

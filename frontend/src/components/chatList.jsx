@@ -3,7 +3,14 @@ import ChatHeader from "./chatHeader";
 import ChatListItem from "./chatListItem";
 import "./chatList.css";
 
-function ChatList({ chats, selectedChatId, onSelectChat, onLogout, onSettings }) {
+function ChatList({
+  chats,
+  selectedChatId,
+  onSelectChat,
+  onLogout,
+  onSettings,
+  onNewChat,
+}) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filtered = chats.filter((c) =>
@@ -12,7 +19,11 @@ function ChatList({ chats, selectedChatId, onSelectChat, onLogout, onSettings })
 
   return (
     <div className="chat-list">
-      <ChatHeader onSettings={onSettings} onLogout={onLogout} />
+      <ChatHeader
+        onSettings={onSettings}
+        onLogout={onLogout}
+        onNewChat={onNewChat}
+      />
       <div className="chat-list-search">
         <div className="chat-list-search-wrapper">
           <svg className="chat-list-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">

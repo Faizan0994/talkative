@@ -48,7 +48,7 @@ function ChatListItem({ chat, isActive, onClick }) {
           <p className="chat-list-item-preview-msg">
             {chat.lastMessage || "No messages yet"}
           </p>
-          {unreadCount > 0 && (
+          {unreadCount > 0 && !isActive && (
             <div className="chat-list-item-badge">
               {unreadCount > 99 ? "99+" : unreadCount}
             </div>

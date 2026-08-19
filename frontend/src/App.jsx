@@ -3,6 +3,7 @@ import WelcomeScreen from "./pages/welcome";
 import SignIn from "./pages/signIn";
 import SignUp from "./pages/signUp";
 import Dashboard from "./pages/dashboard";
+import Settings from "./pages/settings";
 import { Routes, Route } from "react-router";
 import useVisualViewportHeight from "./hooks/useVisualViewportHeight";
 
@@ -16,6 +17,7 @@ function App() {
       <Route path="signup" element={<SignUp />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="dashboard/:chatId" element={<Dashboard />} />
+      <Route path="settings" element={<Settings />} />
     </Routes>
   );
 }

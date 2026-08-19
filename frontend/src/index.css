@@ -44,3 +44,13 @@ body {
 button:hover {
   cursor: pointer;
 }
+
+@media (max-width: 767px) {
+  * {
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}

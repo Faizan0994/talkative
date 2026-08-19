@@ -1,0 +1,215 @@
+.settings-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-1);
+}
+
+.settings-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  padding: 2dvh 4dvw;
+  gap: 2dvh;
+  box-sizing: border-box;
+  background-color: var(--background-2);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-header > .talkative-logo {
+  font-size: 4dvh;
+}
+
+.settings-block .settings-back {
+  background: none;
+  border: none;
+  width: 3dvh;
+  height: 3dvh;
+  cursor: pointer;
+  padding: 0;
+}
+
+.settings-block .settings-back svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--primary-color);
+}
+
+.settings-spacer {
+  width: 3dvh;
+  height: 3dvh;
+}
+
+.settings-title {
+  font-size: 2.6dvh;
+  color: var(--accent-color);
+}
+
+.settings-block form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2dvh;
+}
+
+.settings-avatar {
+  align-self: center;
+  width: 10dvh;
+  height: 10dvh;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 4dvh;
+  overflow: hidden;
+}
+
+.settings-block .form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-block label {
+  font-size: 1.6dvh;
+  padding-left: 2%;
+  color: rgb(58, 57, 57);
+}
+
+.settings-block input {
+  appearance: none;
+  height: 4dvh;
+  border-radius: 8px;
+  border: 1px solid gray;
+  padding-left: 4%;
+}
+
+.settings-block .button-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+}
+
+.settings-block button {
+  border: none;
+  background-color: var(--primary-color);
+  border-radius: 1dvh;
+  font-size: 2dvh;
+  height: 4dvh;
+  font-weight: bold;
+  color: white;
+}
+
+.settings-block .settings-logout {
+  background-color: var(--accent-color);
+  color: grey;
+}
+
+.settings-danger {
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+  border-top: 1px solid lightgray;
+  padding-top: 2dvh;
+}
+
+.settings-danger-title {
+  font-size: 1.8dvh;
+  color: #b00000;
+}
+
+.settings-block .settings-delete {
+  background: none;
+  border: 1px solid #b00000;
+  color: #b00000;
+}
+
+.settings-confirm-text {
+  font-size: 1.6dvh;
+  color: var(--accent-color);
+}
+
+.settings-confirm-actions {
+  display: flex;
+  gap: 2dvw;
+}
+
+.settings-block .settings-confirm-delete {
+  background-color: #b00000;
+  flex: 1;
+}
+
+.settings-block .settings-confirm-cancel {
+  background: none;
+  border: 1px solid gray;
+  color: var(--accent-color);
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .settings-block {
+    max-width: 24vw;
+    max-height: none;
+    height: auto;
+    border-radius: 1vw;
+    box-shadow: 0px 0px 12px 1px rgb(192, 192, 192);
+    padding: 2vw;
+  }
+
+  .settings-header > .talkative-logo {
+    font-size: 3vw;
+  }
+
+  .settings-block .settings-back,
+  .settings-spacer {
+    width: 1.5vw;
+    height: 1.5vw;
+  }
+
+  .settings-title {
+    font-size: 1.6vw;
+  }
+
+  .settings-avatar {
+    width: 6vw;
+    height: 6vw;
+    font-size: 2.4vw;
+  }
+
+  .settings-block label {
+    font-size: 1vw;
+  }
+
+  .settings-block input {
+    height: 2vw;
+  }
+
+  .settings-block button {
+    font-size: 1.2vw;
+    height: 2.2vw;
+    border-radius: 0.5vw;
+  }
+
+  .settings-danger-title {
+    font-size: 1.1vw;
+  }
+
+  .settings-confirm-text {
+    font-size: 0.95vw;
+  }
+
+  .settings-confirm-actions {
+    gap: 0.8vw;
+  }
+}

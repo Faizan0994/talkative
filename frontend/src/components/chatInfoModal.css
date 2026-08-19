@@ -1,0 +1,195 @@
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2dvh;
+}
+
+.chat-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1dvh;
+}
+
+.chat-info-label {
+  font-size: 1.5dvh;
+  font-weight: bold;
+  color: gray;
+}
+
+.chat-info-rename-row {
+  display: flex;
+  gap: 2dvw;
+}
+
+.chat-info-rename {
+  appearance: none;
+  flex: 1;
+  height: 4dvh;
+  border-radius: 1dvh;
+  border: 1px solid gray;
+  padding-left: 3dvw;
+  font-size: 1.8dvh;
+  background-color: white;
+  min-width: 0;
+}
+
+.chat-info-save {
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  font-size: 1.6dvh;
+  border-radius: 1dvh;
+  padding: 0 3dvw;
+}
+
+.chat-info-save:disabled {
+  background-color: var(--accent-color);
+  color: grey;
+  cursor: not-allowed;
+}
+
+.chat-info-members {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8dvh;
+}
+
+.chat-info-member {
+  display: flex;
+  align-items: center;
+  gap: 2dvw;
+  background-color: white;
+  border-radius: 1dvh;
+  padding: 0.8dvh 2dvw;
+}
+
+.chat-info-member-avatar {
+  width: 3.5dvh;
+  height: 3.5dvh;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.6dvh;
+  flex-shrink: 0;
+}
+
+.chat-info-member-name {
+  font-size: 1.8dvh;
+  color: var(--accent-color);
+}
+
+.chat-info-single {
+  font-size: 1.8dvh;
+  color: var(--accent-color);
+  background-color: white;
+  border-radius: 1dvh;
+  padding: 1dvh 2dvw;
+}
+
+.chat-info-add-members {
+  border: 1px solid var(--primary-color);
+  background: none;
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.7dvh;
+  border-radius: 1dvh;
+  padding: 1dvh 2dvw;
+  cursor: pointer;
+}
+
+.chat-info-add {
+  display: flex;
+  flex-direction: column;
+  gap: 2dvh;
+}
+
+.chat-info-add-btn {
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  font-size: 1.8dvh;
+  border-radius: 1dvh;
+  height: 4dvh;
+  cursor: pointer;
+  padding: 0 2dvw;
+}
+
+.chat-info-add-btn:disabled {
+  background-color: var(--accent-color);
+  color: grey;
+  cursor: not-allowed;
+}
+
+.chat-info-leave {
+  border: 1px solid #b00000;
+  background: none;
+  color: #b00000;
+  font-weight: bold;
+  font-size: 1.8dvh;
+  border-radius: 1dvh;
+  padding: 1dvh 2dvw;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .chat-info-rename-row {
+    gap: 0.8vw;
+  }
+
+  .chat-info-rename {
+    height: 2.2vw;
+    border-radius: 0.5vw;
+    padding-left: 1vw;
+    font-size: 0.95vw;
+  }
+
+  .chat-info-save {
+    font-size: 0.9vw;
+    border-radius: 0.5vw;
+    padding: 0 1.2vw;
+  }
+
+  .chat-info-label {
+    font-size: 0.85vw;
+  }
+
+  .chat-info-member {
+    gap: 0.8vw;
+    border-radius: 0.5vw;
+    padding: 0.4vw 0.8vw;
+  }
+
+  .chat-info-member-avatar {
+    width: 1.8vw;
+    height: 1.8vw;
+    font-size: 0.9vw;
+  }
+
+  .chat-info-member-name {
+    font-size: 0.95vw;
+  }
+
+  .chat-info-single {
+    font-size: 0.95vw;
+    border-radius: 0.5vw;
+    padding: 0.5vw 1vw;
+  }
+
+  .chat-info-add-members,
+  .chat-info-leave,
+  .chat-info-add-btn {
+    font-size: 0.95vw;
+    border-radius: 0.5vw;
+    padding: 0.5vw 1vw;
+  }
+
+  .chat-info-add-btn {
+    height: 2.2vw;
+  }
+}
