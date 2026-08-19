@@ -74,6 +74,7 @@
 @media (min-width: 768px) {
   .chat-list {
     gap: 1.5dvh;
+    overflow: hidden;
   }
 
   .chat-list-section {

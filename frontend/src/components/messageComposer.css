@@ -1,0 +1,77 @@
+.message-composer {
+  display: flex;
+  align-items: center;
+  gap: 2dvw;
+  padding: 1.5dvh 4dvw;
+  border-top: 1px solid lightgray;
+  background-color: var(--background-2);
+}
+
+.message-composer-input {
+  flex: 1;
+  height: 4.5dvh;
+  border-radius: 2.25dvh;
+  border: 1px solid transparent;
+  background-color: white;
+  padding: 0 4%;
+  box-sizing: border-box;
+  font-size: 1.8dvh;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.message-composer-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.message-composer-input:disabled {
+  opacity: 0.6;
+}
+
+.message-composer-send {
+  width: 4.5dvh;
+  height: 4.5dvh;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease;
+}
+
+.message-composer-send svg {
+  width: 55%;
+  height: 55%;
+}
+
+.message-composer-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (min-width: 768px) {
+  .message-composer {
+    gap: 1vw;
+    padding: 1.5dvh 2vw;
+  }
+
+  .message-composer-input {
+    height: 2.6vw;
+    border-radius: 1.3vw;
+    font-size: 1vw;
+    padding: 0 1.5vw;
+  }
+
+  .message-composer-send {
+    width: 2.6vw;
+    height: 2.6vw;
+  }
+}

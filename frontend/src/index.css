@@ -3,9 +3,13 @@
   padding: 0;
 }
 
+:root {
+  --app-height: 100dvh;
+}
+
 body {
   width: 100dvw;
-  height: 100dvh;
+  height: var(--app-height);
   background-color: #f0f4f8;
 }
 
