@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./messageComposer.css";
 
-function MessageComposer({ onSend, disabled }) {
+function MessageComposer({ onSend, onTyping, disabled }) {
   const [value, setValue] = useState("");
+  const lastTypingRef = useRef(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -12,6 +13,16 @@ function MessageComposer({ onSend, disabled }) {
     setValue("");
   };
 
+  const handleChange = (e) => {
+    setValue(e.target.value);
+    if (!onTyping) return;
+    const now = Date.now();
+    if (now - lastTypingRef.current >= 2000) {
+      lastTypingRef.current = now;
+      onTyping();
+    }
+  };
+
   return (
     <form className="message-composer" onSubmit={handleSubmit}>
       <input
@@ -19,7 +30,7 @@ function MessageComposer({ onSend, disabled }) {
         type="text"
         placeholder="Type a message..."
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={handleChange}
         disabled={disabled}
       />
       <button

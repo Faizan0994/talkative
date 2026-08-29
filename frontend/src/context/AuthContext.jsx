@@ -139,6 +139,10 @@ export function AuthProvider({ children }) {
 
   const clearError = useCallback(() => setError(""), []);
 
+  const updateUser = useCallback((updates) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -151,6 +155,7 @@ export function AuthProvider({ children }) {
         signup,
         logout,
         clearError,
+        updateUser,
       }}
     >
       {children}

@@ -2,26 +2,48 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Logo from "../components/logo";
 import { useAuth } from "../context/AuthContext";
+import useApi from "../hooks/useApi";
 import "../styles/settings.css";
 
 function Settings() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
+  const { loading, error, put, del, clearError } = useApi();
 
-  const [name, setName] = useState(user?.name || "You");
-  const [username, setUsername] = useState(user?.username || "you");
+  const [name, setName] = useState(user?.name || "");
+  const [username, setUsername] = useState(user?.username || "");
+  const [profilePictureUrl, setProfilePictureUrl] = useState(
+    user?.profilePictureUrl || "",
+  );
   const [saved, setSaved] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
+    clearError();
+    setSaved(false);
+    const res = await put("/api/users/", {
+      name,
+      username,
+      profilePictureUrl,
+    }).catch(() => null);
+    if (!res?.user) return;
+    updateUser(res.user);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
+    setDeleteError("");
+    const err = await del("/api/users/").catch((e) => e);
+    if (err) {
+      setDeleting(false);
+      setDeleteError(err.messages?.[0] || "Failed to delete account");
+      return;
+    }
     await logout();
     navigate("/signin");
   };
@@ -50,8 +72,24 @@ function Settings() {
 
         <h2 className="settings-title">Settings</h2>
 
+        {error && (
+          <div className="settings-error">
+            {error.messages?.[0] || "Something went wrong"}
+          </div>
+        )}
+
         <form onSubmit={handleSave}>
-          <div className="settings-avatar">{name[0].toUpperCase()}</div>
+          <div className="settings-avatar">
+            {profilePictureUrl ? (
+              <img
+                src={profilePictureUrl}
+                alt={name}
+                className="settings-avatar-img"
+              />
+            ) : (
+              name[0]?.toUpperCase() || "Y"
+            )}
+          </div>
           <div className="form-row">
             <label htmlFor="settings-name">Name: </label>
             <input
@@ -74,8 +112,21 @@ function Settings() {
               required
             />
           </div>
+          <div className="form-row">
+            <label htmlFor="settings-picture">Profile picture URL: </label>
+            <input
+              type="url"
+              id="settings-picture"
+              name="profilePictureUrl"
+              value={profilePictureUrl}
+              onChange={(e) => setProfilePictureUrl(e.target.value)}
+              placeholder="https://example.com/photo.jpg"
+            />
+          </div>
           <div className="button-wrapper">
-            <button type="submit">{saved ? "Saved!" : "Save changes"}</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Saving..." : saved ? "Saved!" : "Save changes"}
+            </button>
             <button type="button" className="settings-logout" onClick={handleLogout}>
               Log out
             </button>
@@ -84,6 +135,9 @@ function Settings() {
 
         <div className="settings-danger">
           <h3 className="settings-danger-title">Danger zone</h3>
+          {deleteError && (
+            <div className="settings-error">{deleteError}</div>
+          )}
           {confirmingDelete ? (
             <div className="settings-confirm">
               <p className="settings-confirm-text">
@@ -95,7 +149,7 @@ function Settings() {
                   onClick={handleDeleteAccount}
                   disabled={deleting}
                 >
-                  Delete account
+                  {deleting ? "Deleting..." : "Delete account"}
                 </button>
                 <button
                   className="settings-confirm-cancel"

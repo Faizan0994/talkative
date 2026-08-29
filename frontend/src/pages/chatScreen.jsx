@@ -10,6 +10,7 @@ function ChatScreen({
   onSend,
   onDelete,
   onOpenInfo,
+  onTyping,
   isTyping,
 }) {
   return (
@@ -53,7 +54,7 @@ function ChatScreen({
         emptyMessage="No messages yet"
         onDelete={onDelete}
       />
-      <MessageComposer onSend={onSend} />
+      <MessageComposer onSend={onSend} onTyping={onTyping} />
     </div>
   );
 }

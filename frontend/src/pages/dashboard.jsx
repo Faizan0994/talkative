@@ -1,198 +1,217 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useParams } from "react-router";
 import ChatList from "../components/chatList";
 import ChatScreen from "./chatScreen";
 import NewChatModal from "../components/newChatModal";
 import ChatInfoModal from "../components/chatInfoModal";
+import { ToastContainer } from "../components/toast";
+import useApi from "../hooks/useApi";
+import useSocket from "../hooks/useSocket";
 import "../styles/dashboard.css";
 
-const CURRENT_USER_ID = 99;
-
-const CURRENT_USER = {
-  id: CURRENT_USER_ID,
-  name: "You",
-  username: "you",
-};
-
-const PLACEHOLDER_USERS = [
-  { id: 1, name: "Alice", username: "alice" },
-  { id: 2, name: "Bob", username: "bob" },
-  { id: 3, name: "Carol", username: "carol" },
-  { id: 4, name: "Dave", username: "dave" },
-  { id: 5, name: "Frank", username: "frank" },
-  { id: 6, name: "Grace", username: "grace" },
-  { id: 7, name: "Hank", username: "hank" },
-  { id: 8, name: "Ivy", username: "ivy" },
-  { id: 9, name: "Jack", username: "jack" },
-  { id: 11, name: "Elena", username: "elena" },
-];
-
-const PLACEHOLDER_CHATS = [
-  {
-    id: 1,
-    name: "Alice",
-    isGroup: false,
-    lastMessage: "See you at the meeting!",
-    lastMessageAt: "2026-08-05T12:30:00",
-    unreadCount: 2,
-    participants: [
-      { id: 1, name: "Alice", username: "alice" },
-      CURRENT_USER,
-    ],
-  },
-  {
-    id: 2,
-    name: "Bob",
-    isGroup: false,
-    lastMessage: "Sent the report over, let me know what you think.",
-    lastMessageAt: "2026-08-04T18:05:00",
+function transformChat(chat, currentUserId) {
+  const lastMessage = chat.messages?.[0];
+  const other = chat.participants?.find((p) => p.id !== currentUserId);
+  return {
+    id: chat.id,
+    name: chat.isGroup
+      ? chat.name || ""
+      : other?.name || chat.name || "",
+    isGroup: chat.isGroup,
+    participants: chat.participants || [],
+    lastMessage: lastMessage?.content ?? null,
+    lastMessageAt: lastMessage?.timestamp ?? null,
     unreadCount: 0,
-    participants: [
-      { id: 2, name: "Bob", username: "bob" },
-      CURRENT_USER,
-    ],
-  },
-  {
-    id: 3,
-    name: "Work Team",
-    isGroup: true,
-    lastMessage: "Elena: Sprint review is at 2pm.",
-    lastMessageAt: "2026-08-05T09:15:00",
-    unreadCount: 7,
-    participants: [
-      { id: 11, name: "Elena", username: "elena" },
-      { id: 1, name: "Alice", username: "alice" },
-      { id: 2, name: "Bob", username: "bob" },
-      CURRENT_USER,
-    ],
-  },
-  {
-    id: 4,
-    name: "Family Group",
-    isGroup: true,
-    lastMessage: null,
-    lastMessageAt: null,
-    unreadCount: 0,
-    participants: [
-      { id: 3, name: "Carol", username: "carol" },
-      { id: 4, name: "Dave", username: "dave" },
-      CURRENT_USER,
-    ],
-  },
-];
+  };
+}
 
-const PLACEHOLDER_MESSAGES = {
-  1: [
-    {
-      id: 101,
-      content: "Hey! Did you get the deck I sent?",
-      timestamp: "2026-08-05T10:05:00",
-      read: true,
-      senderId: 1,
-      sender: { id: 1, name: "Alice" },
-    },
-    {
-      id: 102,
-      content: "Yes, it looks great. Nice work.",
-      timestamp: "2026-08-05T10:12:00",
-      read: true,
-      senderId: CURRENT_USER_ID,
-      sender: { id: CURRENT_USER_ID, name: "You" },
-    },
-    {
-      id: 103,
-      content: "I made a few tweaks to the pricing slide, mind taking a look?",
-      timestamp: "2026-08-05T10:15:00",
-      read: true,
-      senderId: 1,
-      sender: { id: 1, name: "Alice" },
-    },
-    {
-      id: 104,
-      content: "Sure, sending them over in a few minutes from now.",
-      timestamp: "2026-08-05T10:20:00",
-      read: true,
-      senderId: CURRENT_USER_ID,
-      sender: { id: CURRENT_USER_ID, name: "You" },
-    },
-    {
-      id: 105,
-      content: "Perfect, thanks! See you at the meeting!",
-      timestamp: "2026-08-05T12:30:00",
-      read: false,
-      senderId: 1,
-      sender: { id: 1, name: "Alice" },
-    },
-  ],
-  2: [
-    {
-      id: 201,
-      content: "Morning! How is the report coming along?",
-      timestamp: "2026-08-03T09:00:00",
-      read: true,
-      senderId: 2,
-      sender: { id: 2, name: "Bob" },
-    },
-    {
-      id: 202,
-      content: "Almost done, just polishing the summary.",
-      timestamp: "2026-08-03T09:30:00",
-      read: true,
-      senderId: CURRENT_USER_ID,
-      sender: { id: CURRENT_USER_ID, name: "You" },
-    },
-    {
-      id: 203,
-      content: "Sent the report over, let me know what you think.",
-      timestamp: "2026-08-04T18:05:00",
-      read: true,
-      senderId: 2,
-      sender: { id: 2, name: "Bob" },
-    },
-  ],
-  3: [
-    {
-      id: 301,
-      content: "Hey team, quick standup at 9:30?",
-      timestamp: "2026-08-04T08:45:00",
-      read: true,
-      senderId: 11,
-      sender: { id: 11, name: "Elena" },
-    },
-    {
-      id: 302,
-      content: "Works for me.",
-      timestamp: "2026-08-04T08:50:00",
-      read: true,
-      senderId: CURRENT_USER_ID,
-      sender: { id: CURRENT_USER_ID, name: "You" },
-    },
-    {
-      id: 303,
-      content: "Elena: Sprint review is at 2pm.",
-      timestamp: "2026-08-05T09:15:00",
-      read: false,
-      senderId: 11,
-      sender: { id: 11, name: "Elena" },
-    },
-  ],
-  4: [],
-};
+const SKELETON_ROWS = [0, 1, 2, 3, 4, 5];
 
 function Dashboard() {
-  const [chats, setChats] = useState(PLACEHOLDER_CHATS);
-  const [messagesByChat, setMessagesByChat] = useState(PLACEHOLDER_MESSAGES);
-  const [showNewChat, setShowNewChat] = useState(false);
-  const [showChatInfo, setShowChatInfo] = useState(false);
-  const { logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { chatId } = useParams();
+  const { loading, error, get, post, put, patch, del } = useApi();
+  const { joinChat, leaveChat, sendMessage, sendTyping, onNewMessage, onUserTyping } =
+    useSocket();
 
+  const [chats, setChats] = useState([]);
+  const [messagesByChat, setMessagesByChat] = useState({});
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [showChatInfo, setShowChatInfo] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [isTyping, setIsTyping] = useState(null);
+  const [searchedUsers, setSearchedUsers] = useState([]);
+  const [toasts, setToasts] = useState([]);
+
+  const typingTimeoutRef = useRef(null);
+
+  const addToast = useCallback((message) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message }]);
+  }, []);
+
+  const dismissToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const searchUsers = useCallback(
+    async (query) => {
+      if (!query || query.trim().length === 0) {
+        setSearchedUsers([]);
+        return;
+      }
+      const res = await get(
+        `/api/users?search=${encodeURIComponent(query.trim())}`,
+      ).catch(() => null);
+      setSearchedUsers(res?.users || []);
+    },
+    [get],
+  );
+
+  const currentUserId = user?.id;
   const selectedChatId = chatId ? +chatId : null;
   const showChat = !!(
     selectedChatId && chats.find((c) => c.id === selectedChatId)
   );
+
+  const loadChats = useCallback(async () => {
+    const res = await get("/api/chats/").catch(() => null);
+    if (!res) return;
+    const loaded = res.chats.map((chat) => transformChat(chat, currentUserId));
+    setChats(loaded);
+    loaded.forEach((chat) => {
+      get(`/api/chats/${chat.id}/unread-count`)
+        .then((data) => {
+          if (!data) return;
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === chat.id ? { ...c, unreadCount: data.unreadCount } : c,
+            ),
+          );
+        })
+        .catch(() => {});
+    });
+  }, [get, currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    loadChats();
+  }, [loadChats, currentUserId]);
+
+  useEffect(() => {
+    if (!selectedChatId) return;
+    setLoadingMessages(true);
+    get(`/api/chats/${selectedChatId}`)
+      .then((res) => {
+        if (!res?.chat) return;
+        const chat = res.chat;
+        const transformed = chat.messages.map((m) => ({
+          ...m,
+          sender: chat.participants.find((p) => p.id === m.senderId) || {
+            id: m.senderId,
+            name: "Unknown",
+          },
+        }));
+        setMessagesByChat((prev) => ({ ...prev, [selectedChatId]: transformed }));
+        setChats((prev) =>
+          prev.map((c) =>
+            c.id === selectedChatId
+              ? { ...c, participants: chat.participants }
+              : c,
+          ),
+        );
+      })
+      .catch(() => {})
+      .finally(() => setLoadingMessages(false));
+    patch(`/api/chats/${selectedChatId}/read`).catch(() => {});
+    setChats((prev) =>
+      prev.map((c) =>
+        c.id === selectedChatId ? { ...c, unreadCount: 0 } : c,
+      ),
+    );
+  }, [selectedChatId, get, patch]);
+
+  const joinedRoomsRef = useRef(new Set());
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const topChats = chats.slice(0, 5);
+    const targetIds = new Set(topChats.map((c) => c.id));
+
+    topChats.forEach((chat) => {
+      if (!joinedRoomsRef.current.has(chat.id)) {
+        joinChat(chat.id);
+        joinedRoomsRef.current.add(chat.id);
+      }
+    });
+
+    joinedRoomsRef.current.forEach((id) => {
+      if (!targetIds.has(id)) {
+        leaveChat(id);
+        joinedRoomsRef.current.delete(id);
+      }
+    });
+
+    const joined = joinedRoomsRef.current;
+    return () => {
+      joined.forEach((id) => leaveChat(id));
+      joined.clear();
+    };
+  }, [chats, currentUserId, joinChat, leaveChat]);
+
+  useEffect(() => {
+    const unsub = onNewMessage((msg) => {
+      setMessagesByChat((prev) => {
+        const existing = prev[msg.chatId] || [];
+        if (existing.some((m) => m.id === msg.id)) return prev;
+        const sender =
+          chats
+            .find((c) => c.id === msg.chatId)
+            ?.participants?.find((p) => p.id === msg.senderId) || {
+            id: msg.senderId,
+            name: "Unknown",
+        };
+        const enriched = { ...msg, sender };
+        return { ...prev, [msg.chatId]: [...existing, enriched] };
+      });
+      if (msg.chatId !== selectedChatId) {
+        const chat = chats.find((c) => c.id === msg.chatId);
+        addToast(`${chat?.name || "Unknown chat"}: new message(s)`);
+        setChats((prev) =>
+          prev.map((c) =>
+            c.id === msg.chatId
+              ? {
+                  ...c,
+                  lastMessage: msg.content,
+                  lastMessageAt: msg.timestamp,
+                  unreadCount: (c.unreadCount || 0) + 1,
+                }
+              : c,
+          ),
+        );
+      }
+    });
+    return unsub;
+  }, [onNewMessage, selectedChatId, chats, addToast]);
+
+  useEffect(() => {
+    const unsub = onUserTyping((data) => {
+      if (data.chatId !== selectedChatId) return;
+      setIsTyping(data.username);
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => setIsTyping(null), 3000);
+    });
+    return () => {
+      unsub();
+      clearTimeout(typingTimeoutRef.current);
+    };
+  }, [onUserTyping, selectedChatId]);
+
+  if (!user && !authLoading) {
+    return <Navigate to="/signin" replace />;
+  }
 
   const handleSelectChat = (id) => {
     navigate(`/dashboard/${id}`);
@@ -204,21 +223,30 @@ function Dashboard() {
 
   const handleSend = (content) => {
     if (!selectedChatId) return;
-    const id = selectedChatId;
+    const id = Date.now();
     setMessagesByChat((prev) => ({
       ...prev,
-      [id]: [
-        ...(prev[id] || []),
+      [selectedChatId]: [
+        ...(prev[selectedChatId] || []),
         {
-          id: Date.now(),
+          id,
           content,
           timestamp: new Date().toISOString(),
           read: false,
-          senderId: CURRENT_USER_ID,
-          sender: { id: CURRENT_USER_ID, name: "You" },
+          senderId: currentUserId,
+          sender: { id: currentUserId, name: user.name },
         },
       ],
     }));
+    sendMessage(selectedChatId, content).then((res) => {
+      if (res?.error || res?.message) return;
+      setMessagesByChat((prev) => ({
+        ...prev,
+        [selectedChatId]: (prev[selectedChatId] || []).map((m) =>
+          m.id === id ? { ...m, id: res.id } : m,
+        ),
+      }));
+    });
   };
 
   const handleLogout = async () => {
@@ -230,10 +258,7 @@ function Dashboard() {
     navigate("/settings");
   };
 
-  const handleStartChat = (userId) => {
-    const user = PLACEHOLDER_USERS.find((u) => u.id === userId);
-    if (!user) return;
-
+  const handleStartChat = async (userId) => {
     const existing = chats.find(
       (c) =>
         !c.isGroup &&
@@ -245,64 +270,52 @@ function Dashboard() {
       return;
     }
 
-    const id = Date.now();
-    const newChat = {
-      id,
-      name: user.name,
-      isGroup: false,
-      lastMessage: null,
-      lastMessageAt: null,
-      unreadCount: 0,
-      participants: [user, CURRENT_USER],
-    };
-    setChats((prev) => [newChat, ...prev]);
-    setMessagesByChat((prev) => ({ ...prev, [id]: [] }));
-    navigate(`/dashboard/${id}`);
+    const res = await post("/api/chats/", { userIds: [userId] }).catch(
+      () => null,
+    );
+    if (!res?.chat) return;
+    const chat = transformChat(res.chat, currentUserId);
+    setChats((prev) => [chat, ...prev]);
+    navigate(`/dashboard/${chat.id}`);
   };
 
-  const handleCreateGroup = (name, userIds) => {
-    const members = userIds
-      .map((id) => PLACEHOLDER_USERS.find((u) => u.id === id))
-      .filter(Boolean);
-
-    const id = Date.now();
-    const newChat = {
-      id,
-      name,
-      isGroup: true,
-      lastMessage: null,
-      lastMessageAt: null,
-      unreadCount: 0,
-      participants: [...members, CURRENT_USER],
-    };
-    setChats((prev) => [newChat, ...prev]);
-    setMessagesByChat((prev) => ({ ...prev, [id]: [] }));
-    navigate(`/dashboard/${id}`);
+  const handleCreateGroup = async (name, userIds) => {
+    const res = await post("/api/chats/", { userIds, name }).catch(() => null);
+    if (!res?.chat) return;
+    const chat = transformChat(res.chat, currentUserId);
+    setChats((prev) => [chat, ...prev]);
+    navigate(`/dashboard/${chat.id}`);
   };
 
-  const handleRenameChat = (name) => {
+  const handleRenameChat = async (name) => {
     if (!selectedChatId) return;
+    const res = await put(`/api/chats/${selectedChatId}`, { name }).catch(
+      () => null,
+    );
+    if (!res?.chat) return;
     setChats((prev) =>
       prev.map((c) => (c.id === selectedChatId ? { ...c, name } : c)),
     );
   };
 
-  const handleAddParticipants = (userIds) => {
+  const handleAddParticipants = async (userIds) => {
     if (!selectedChatId) return;
-    const newMembers = userIds
-      .map((id) => PLACEHOLDER_USERS.find((u) => u.id === id))
-      .filter(Boolean);
+    await post(`/api/chats/${selectedChatId}`, { userIds }).catch(() => {});
+    const res = await get(`/api/chats/${selectedChatId}`).catch(() => null);
+    if (!res?.chat) return;
     setChats((prev) =>
       prev.map((c) =>
         c.id === selectedChatId
-          ? { ...c, participants: [...c.participants, ...newMembers] }
+          ? { ...c, participants: res.chat.participants }
           : c,
       ),
     );
   };
 
-  const handleLeaveChat = () => {
+  const handleLeaveChat = async () => {
     if (!selectedChatId) return;
+    await post(`/api/chats/${selectedChatId}/leave`).catch(() => {});
+    leaveChat(selectedChatId);
     setChats((prev) => prev.filter((c) => c.id !== selectedChatId));
     setMessagesByChat((prev) => {
       const next = { ...prev };
@@ -320,11 +333,17 @@ function Dashboard() {
       ...prev,
       [id]: (prev[id] || []).filter((m) => m.id !== messageId),
     }));
+    del(`/api/messages/${messageId}`).catch(() => {});
+  };
+
+  const handleTyping = () => {
+    if (!selectedChatId) return;
+    sendTyping(selectedChatId);
   };
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
   const visibleMessages = (messagesByChat[selectedChatId] || []).map((m) =>
-    m.senderId === CURRENT_USER_ID ? { ...m, read: true } : m,
+    m.senderId === currentUserId ? { ...m, read: true } : m,
   );
 
   return (
@@ -332,28 +351,61 @@ function Dashboard() {
       <div
         className={`dashboard-chats ${showChat ? "dashboard-chats-hidden" : ""}`}
       >
-        <ChatList
-          chats={chats}
-          selectedChatId={selectedChatId}
-          onSelectChat={handleSelectChat}
-          onLogout={handleLogout}
-          onSettings={handleSettings}
-          onNewChat={() => setShowNewChat(true)}
-        />
+        {loading || (authLoading && !currentUserId) ? (
+          <div className="dashboard-skeleton" aria-hidden="true">
+            {SKELETON_ROWS.map((row) => (
+              <div className="dashboard-skeleton-item" key={row}>
+                <div className="dashboard-skeleton-avatar" />
+                <div className="dashboard-skeleton-lines">
+                  <div className="dashboard-skeleton-line dashboard-skeleton-line--short" />
+                  <div className="dashboard-skeleton-line" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="dashboard-error">
+            <p className="dashboard-error-message">
+              {error.messages?.[0] || "Something went wrong"}
+            </p>
+            <button className="dashboard-error-retry" onClick={loadChats}>
+              Try again
+            </button>
+          </div>
+        ) : (
+          <ChatList
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onSelectChat={handleSelectChat}
+            onLogout={handleLogout}
+            onSettings={handleSettings}
+            onNewChat={() => setShowNewChat(true)}
+          />
+        )}
       </div>
       <div
         className={`dashboard-main ${showChat ? "dashboard-main-visible" : ""}`}
       >
         {selectedChat ? (
-          <ChatScreen
-            chat={selectedChat}
-            messages={visibleMessages}
-            currentUserId={CURRENT_USER_ID}
-            onBack={handleBack}
-            onSend={handleSend}
-            onDelete={handleDeleteMessage}
-            onOpenInfo={() => setShowChatInfo(true)}
-          />
+          loadingMessages ? (
+            <div className="dashboard-message-skeleton" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <div className="dashboard-message-skeleton-bubble" key={i} />
+              ))}
+            </div>
+          ) : (
+            <ChatScreen
+              chat={selectedChat}
+              messages={visibleMessages}
+              currentUserId={currentUserId}
+              onBack={handleBack}
+              onSend={handleSend}
+              onDelete={handleDeleteMessage}
+              onOpenInfo={() => setShowChatInfo(true)}
+              onTyping={handleTyping}
+              isTyping={isTyping}
+            />
+          )
         ) : (
           <div className="dashboard-placeholder">
             Select a chat to start messaging
@@ -363,22 +415,32 @@ function Dashboard() {
 
       <NewChatModal
         open={showNewChat}
-        onClose={() => setShowNewChat(false)}
-        users={PLACEHOLDER_USERS}
+        onClose={() => {
+          setShowNewChat(false);
+          setSearchedUsers([]);
+        }}
+        users={searchedUsers}
+        onSearchUsers={searchUsers}
         onStartChat={handleStartChat}
         onCreateGroup={handleCreateGroup}
       />
 
       <ChatInfoModal
         open={showChatInfo}
-        onClose={() => setShowChatInfo(false)}
+        onClose={() => {
+          setShowChatInfo(false);
+          setSearchedUsers([]);
+        }}
         chat={selectedChat}
-        users={PLACEHOLDER_USERS}
-        currentUserId={CURRENT_USER_ID}
+        users={searchedUsers}
+        onSearchUsers={searchUsers}
+        currentUserId={currentUserId}
         onRenameChat={handleRenameChat}
         onAddParticipants={handleAddParticipants}
         onLeaveChat={handleLeaveChat}
       />
+
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

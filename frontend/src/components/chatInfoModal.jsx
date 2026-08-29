@@ -6,6 +6,7 @@ import "./chatInfoModal.css";
 function ChatInfoForm({
   chat,
   users,
+  onSearchUsers,
   currentUserId,
   onRenameChat,
   onAddParticipants,
@@ -91,6 +92,7 @@ function ChatInfoForm({
                     )
                   }
                   excludeIds={memberIds}
+                  onSearch={onSearchUsers}
                 />
                 <button
                   className="chat-info-add-btn"
@@ -133,6 +135,7 @@ function ChatInfoModal({
   onClose,
   chat,
   users,
+  onSearchUsers,
   currentUserId,
   onRenameChat,
   onAddParticipants,
@@ -144,6 +147,7 @@ function ChatInfoModal({
         <ChatInfoForm
           chat={chat}
           users={users}
+          onSearchUsers={onSearchUsers}
           currentUserId={currentUserId}
           onRenameChat={onRenameChat}
           onAddParticipants={onAddParticipants}

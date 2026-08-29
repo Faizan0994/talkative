@@ -50,7 +50,9 @@ function ChatList({
           />
         ))}
         {filtered.length === 0 && (
-          <div className="chat-list-empty">No chats found</div>
+          <div className="chat-list-empty">
+            {searchQuery ? "No chats found" : "No conversations yet. Start a new chat!"}
+          </div>
         )}
       </div>
     </div>

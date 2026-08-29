@@ -7,18 +7,27 @@ function UserPicker({
   selectedIds = [],
   onToggle,
   excludeIds = [],
+  onSearch,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filtered = users.filter((u) => {
-    if (excludeIds.includes(u.id)) return false;
-    const q = searchQuery.toLowerCase();
-    return (
-      !q ||
-      u.name.toLowerCase().includes(q) ||
-      u.username.toLowerCase().includes(q)
-    );
-  });
+  const filtered = onSearch
+    ? users.filter((u) => !excludeIds.includes(u.id))
+    : users.filter((u) => {
+        if (excludeIds.includes(u.id)) return false;
+        const q = searchQuery.toLowerCase();
+        return (
+          !q ||
+          u.name.toLowerCase().includes(q) ||
+          u.username.toLowerCase().includes(q)
+        );
+      });
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (onSearch) onSearch(value);
+  };
 
   return (
     <div className="user-picker">
@@ -35,7 +44,7 @@ function UserPicker({
           type="text"
           placeholder="Search people"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
       {filtered.length === 0 ? (

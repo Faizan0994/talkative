@@ -54,6 +54,15 @@
   color: var(--accent-color);
 }
 
+.settings-error {
+  background-color: #fdecea;
+  color: #b00000;
+  padding: 1dvh 2dvw;
+  border-radius: 0.5dvh;
+  font-size: 1.6dvh;
+  text-align: center;
+}
+
 .settings-block form {
   display: flex;
   flex-direction: column;
@@ -74,6 +83,12 @@
   font-weight: bold;
   font-size: 4dvh;
   overflow: hidden;
+}
+
+.settings-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .settings-block .form-row {
@@ -185,6 +200,10 @@
     width: 6vw;
     height: 6vw;
     font-size: 2.4vw;
+  }
+
+  .settings-error {
+    font-size: 1vw;
   }
 
   .settings-block label {

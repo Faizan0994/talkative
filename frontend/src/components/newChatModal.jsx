@@ -3,7 +3,13 @@ import Modal from "./modal";
 import UserPicker from "./userPicker";
 import "./newChatModal.css";
 
-function NewChatForm({ users, onStartChat, onCreateGroup, onClose }) {
+function NewChatForm({
+  users,
+  onSearchUsers,
+  onStartChat,
+  onCreateGroup,
+  onClose,
+}) {
   const [tab, setTab] = useState("chat");
   const [groupUserIds, setGroupUserIds] = useState([]);
   const [groupName, setGroupName] = useState("");
@@ -64,6 +70,7 @@ function NewChatForm({ users, onStartChat, onCreateGroup, onClose }) {
         mode={tab === "chat" ? "single" : "multi"}
         selectedIds={tab === "chat" ? [] : groupUserIds}
         onToggle={tab === "chat" ? handleSelectChatUser : handleToggleGroupUser}
+        onSearch={onSearchUsers}
       />
 
       {tab === "group" && (
@@ -79,12 +86,20 @@ function NewChatForm({ users, onStartChat, onCreateGroup, onClose }) {
   );
 }
 
-function NewChatModal({ open, onClose, users, onStartChat, onCreateGroup }) {
+function NewChatModal({
+  open,
+  onClose,
+  users,
+  onSearchUsers,
+  onStartChat,
+  onCreateGroup,
+}) {
   return (
     <Modal open={open} onClose={onClose} title="New chat">
       {open && (
         <NewChatForm
           users={users}
+          onSearchUsers={onSearchUsers}
           onStartChat={onStartChat}
           onCreateGroup={onCreateGroup}
           onClose={onClose}
