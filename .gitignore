@@ -141,3 +141,5 @@ vite.config.ts.timestamp-*
 /generated/prisma
 
 AGENTS.md
+
+INTEGRATION-PLAN.md
