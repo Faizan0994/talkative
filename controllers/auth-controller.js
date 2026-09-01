@@ -109,6 +109,12 @@ exports.signup = [
       if (!userCreated)
         return res.status(409).json({ errors: ["Username already taken"] });
       const user = await queries.getUserByName(username);
+
+      const group = await queries.findChatByName("random strangers");
+      if (group) {
+        await queries.addUserToChat(group.id, user.id).catch(() => {});
+      }
+
       const { password: pass, tokens, ...safeUser } = user;
       return res.status(201).json(safeUser);
     } catch {

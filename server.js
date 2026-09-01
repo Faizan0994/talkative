@@ -2,6 +2,7 @@ const app = require("./app");
 const http = require("http");
 const { Server } = require("socket.io");
 const { socketAuthentication, handleConnection } = require("./lib/socket");
+const { ensureRandomStrangers } = require("./scripts/ensure-random-strangers");
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -15,9 +16,17 @@ io.use(socketAuthentication);
 
 io.on("connection", handleConnection(io));
 
-server.listen(process.env.PORT || 3000, (error) => {
-  console.log("server listening...");
-  if (error) {
-    console.log(error);
-  }
-});
+const PORT = process.env.PORT || 3000;
+
+ensureRandomStrangers()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`server listening on port ${PORT}...`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to ensure random strangers group:", err);
+    server.listen(PORT, () => {
+      console.log(`server listening on port ${PORT} (group init failed)...`);
+    });
+  });
