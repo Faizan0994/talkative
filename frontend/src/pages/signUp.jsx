@@ -57,21 +57,11 @@ function SignUp() {
           </div>
           <div className="form-row">
             <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-            />
+            <input type="password" id="password" name="password" required />
           </div>
           <div className="form-row">
             <label htmlFor="confirm">Confirm Password:</label>
-            <input
-              type="password"
-              id="confirm"
-              name="confirm"
-              required
-            />
+            <input type="password" id="confirm" name="confirm" required />
           </div>
           <div className="button-wrapper">
             <button type="submit" className={loading ? "inactive" : ""}>
@@ -82,6 +72,9 @@ function SignUp() {
             </p>
           </div>
         </form>
+        <p className="signup-disclaimer">
+          Do not use your real name or personal info. This is a public chat app.
+        </p>
       </div>
     </div>
   );

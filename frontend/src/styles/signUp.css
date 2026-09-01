@@ -103,6 +103,14 @@
   flex: 0;
 }
 
+.signup-disclaimer {
+  font-size: 1.3dvh;
+  color: #b00000;
+  margin-top: 1.5dvh;
+  text-align: center;
+  max-width: 76vw;
+}
+
 .signup-block button.inactive {
   background-color: var(--accent-color);
   color: grey;
@@ -135,5 +143,10 @@
 
   .signup-block button {
     font-size: 1.2vw;
+  }
+
+  .signup-disclaimer {
+    font-size: 0.8vw;
+    max-width: 20vw;
   }
 }
