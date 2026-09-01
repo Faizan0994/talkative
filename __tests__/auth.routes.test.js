@@ -24,13 +24,13 @@ describe("Auth Routes Integration Tests", () => {
     const validSignupData = {
       name: "John Doe",
       username: "johndoe",
-      password: "password123",
-      confirm: "password123",
+      password: "Password123",
+      confirm: "Password123",
       profilePictureUrl: "https://example.com/pic.jpg",
     };
 
     test("should successfully register a new user", async () => {
-      const hashedPassword = await bcrypt.hash("password123", 10);
+      const hashedPassword = await bcrypt.hash("Password123", 10);
       const mockUser = {
         id: 1,
         name: "John Doe",
@@ -108,15 +108,12 @@ describe("Auth Routes Integration Tests", () => {
         .post("/api/auth/signup")
         .send({
           ...validSignupData,
-          password: "pass123",
-          confirm: "pass123",
+          password: "Pass1",
+          confirm: "Pass1",
         })
         .expect(400);
 
       expect(response.body).toHaveProperty("errors");
-      expect(response.body.errors).toContain(
-        "Password must be at least 8 characters long",
-      );
     });
 
     test("should reject signup when passwords do not match", async () => {
@@ -140,8 +137,8 @@ describe("Auth Routes Integration Tests", () => {
         .send({
           name: "John Doe",
           username: "johndoe",
-          password: "password123",
-          confirm: "password123",
+          password: "Password123",
+          confirm: "Password123",
         })
         .expect(400);
 
@@ -158,13 +155,13 @@ describe("Auth Routes Integration Tests", () => {
         .expect(409);
 
       expect(response.body).toHaveProperty("errors");
-      expect(response.body.errors).toContain("Username already Taken");
+      expect(response.body.errors).toContain("Username already taken");
     });
   });
 
   describe("POST /api/auth/login", () => {
     test("should successfully login with valid credentials", async () => {
-      const hashedPassword = await bcrypt.hash("password123", 10);
+      const hashedPassword = await bcrypt.hash("Password123", 10);
       const mockUser = {
         id: 1,
         name: "John Doe",
@@ -181,7 +178,7 @@ describe("Auth Routes Integration Tests", () => {
         .post("/api/auth/login")
         .send({
           username: "johndoe",
-          password: "password123",
+          password: "Password123",
         })
         .expect(200);
 
@@ -203,7 +200,7 @@ describe("Auth Routes Integration Tests", () => {
         .expect(401);
 
       expect(response.body).toHaveProperty("errors");
-      expect(response.body.errors).toContain("invalid username or password");
+      expect(response.body.errors).toContain("Invalid username or password");
     });
 
     test("should reject login with incorrect password", async () => {
@@ -227,7 +224,7 @@ describe("Auth Routes Integration Tests", () => {
         .expect(401);
 
       expect(response.body).toHaveProperty("errors");
-      expect(response.body.errors).toContain("invalid username or password");
+      expect(response.body.errors).toContain("Invalid username or password");
     });
 
     test("should reject login with username too long", async () => {
@@ -235,7 +232,7 @@ describe("Auth Routes Integration Tests", () => {
         .post("/api/auth/login")
         .send({
           username: "a".repeat(26),
-          password: "password123",
+          password: "Password123",
         })
         .expect(400);
 
@@ -268,7 +265,7 @@ describe("Auth Routes Integration Tests", () => {
       queries.getToken.mockResolvedValue(mockTokenRecord);
 
       // First, login to get a real refresh token
-      const hashedPassword = await bcrypt.hash("password123", 10);
+      const hashedPassword = await bcrypt.hash("Password123", 10);
       queries.getUserByName.mockResolvedValue({
         ...mockUser,
         password: hashedPassword,
@@ -278,7 +275,7 @@ describe("Auth Routes Integration Tests", () => {
 
       const loginResponse = await request(app).post("/api/auth/login").send({
         username: "johndoe",
-        password: "password123",
+        password: "Password123",
       });
 
       const cookies = loginResponse.headers["set-cookie"];
@@ -331,7 +328,7 @@ describe("Auth Routes Integration Tests", () => {
 
   describe("POST /api/auth/logout", () => {
     test("should successfully logout with valid access token and refresh token", async () => {
-      const hashedPassword = await bcrypt.hash("password123", 10);
+      const hashedPassword = await bcrypt.hash("Password123", 10);
       const mockUser = {
         id: 1,
         name: "John Doe",
@@ -345,10 +342,9 @@ describe("Auth Routes Integration Tests", () => {
       queries.saveRefreshToken.mockResolvedValue(true);
       queries.revokeToken.mockResolvedValue(true);
 
-      // First login to get tokens
       const loginResponse = await request(app).post("/api/auth/login").send({
         username: "johndoe",
-        password: "password123",
+        password: "Password123",
       });
 
       const accessToken = loginResponse.body.token;

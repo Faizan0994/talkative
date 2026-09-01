@@ -55,29 +55,36 @@ exports.updateUser = [
   verifyToken,
   validator,
   async (req, res) => {
-    const user = req.user; // Only allow user to update their own profile, not anyone else's
+    const user = req.user;
 
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
-      //TODO: Test this
-      errors = errors.array().map((err) => {
-        return err.msg;
-      });
-      return res.status(400).json({ errors: errors });
+      errors = errors.array().map((err) => err.msg);
+      return res.status(400).json({ errors });
     }
 
     const { name, username, profilePictureUrl } = req.body;
 
-    await queries.updateUser(user.id, name, username, profilePictureUrl);
+    try {
+      if (username !== user.username) {
+        const existing = await queries.getUserByName(username);
+        if (existing)
+          return res.status(409).json({ errors: ["Username already taken"] });
+      }
 
-    return res.status(200).json({
-      user: {
-        id: user.id,
-        name,
-        username,
-        profilePictureUrl,
-      },
-    });
+      await queries.updateUser(user.id, name, username, profilePictureUrl);
+
+      return res.status(200).json({
+        user: {
+          id: user.id,
+          name,
+          username,
+          profilePictureUrl,
+        },
+      });
+    } catch {
+      return res.status(500).json({ errors: ["Error updating profile"] });
+    }
   },
 ];
 

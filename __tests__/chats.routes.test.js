@@ -301,7 +301,7 @@ describe("Chats Routes Integration Tests", () => {
         .expect(200);
 
       expect(response.body.chat).toEqual(mockChat);
-      expect(queries.getChat).toHaveBeenCalledWith(1);
+      expect(queries.getChat).toHaveBeenCalledWith(1, 50);
     });
 
     test("should return 404 when chat does not exist", async () => {
@@ -334,14 +334,10 @@ describe("Chats Routes Integration Tests", () => {
     });
 
     test("should handle non-numeric chat ID", async () => {
-      queries.getChat.mockResolvedValue(null);
-
       const response = await request(app)
         .get("/api/chats/abc")
         .set("Authorization", `Bearer ${authToken}`)
-        .expect(404);
-
-      expect(queries.getChat).toHaveBeenCalledWith(NaN);
+        .expect(400);
     });
 
     test("should handle database errors gracefully", async () => {
@@ -823,6 +819,10 @@ describe("Chats Routes Integration Tests", () => {
 
   describe("GET /api/chats/:id/unread-count (getUnreadCount)", () => {
     test("should successfully return unread count for a chat", async () => {
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.unreadMessagesCount.mockResolvedValue(5);
 
       const response = await request(app)
@@ -835,6 +835,10 @@ describe("Chats Routes Integration Tests", () => {
     });
 
     test("should return 0 when there are no unread messages", async () => {
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.unreadMessagesCount.mockResolvedValue(0);
 
       const response = await request(app)
@@ -846,6 +850,10 @@ describe("Chats Routes Integration Tests", () => {
     });
 
     test("should handle database errors gracefully", async () => {
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.unreadMessagesCount.mockRejectedValue(
         new Error("Database error"),
       );
@@ -868,6 +876,11 @@ describe("Chats Routes Integration Tests", () => {
 
   describe("POST /api/chats/:id/leave (leaveChat)", () => {
     test("should successfully remove user from chat", async () => {
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        isGroup: true,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.removeChatParticipant.mockResolvedValue();
 
       const response = await request(app)
@@ -879,6 +892,11 @@ describe("Chats Routes Integration Tests", () => {
     });
 
     test("should handle database errors gracefully", async () => {
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        isGroup: true,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.removeChatParticipant.mockRejectedValue(
         new Error("Database error"),
       );
@@ -900,6 +918,11 @@ describe("Chats Routes Integration Tests", () => {
 
     test("should allow user to leave even if not currently in chat (query enforces isGroup)", async () => {
       // This tests that the endpoint trusts the query layer's constraints
+      queries.getChat.mockResolvedValue({
+        id: 1,
+        isGroup: true,
+        participants: [{ id: 1, name: "John Doe" }],
+      });
       queries.removeChatParticipant.mockResolvedValue();
 
       const response = await request(app)

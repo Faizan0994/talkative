@@ -7,22 +7,26 @@ const crypto = require("crypto");
 const validator = [
   body("name")
     .trim()
-    .matches(/^[A-Za-z\s]+$/) // Only letters and spaces
+    .matches(/^[A-Za-z\s]+$/)
     .withMessage("Name must contain only letters and spaces")
     .isLength({ min: 3, max: 25 })
     .withMessage("Name must be between 3 and 25 characters long"),
   body("username")
     .trim()
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage("Username must contain only letters, numbers, and underscores")
     .isLength({ min: 3, max: 25 })
-    .withMessage("username must be between 3 and 25 characters long"),
+    .withMessage("Username must be between 3 and 25 characters long"),
   body("password")
-    .trim()
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
-    .isLength({ max: 50 })
-    .withMessage("Password must not be more than 50 characters long"),
+    .isLength({ min: 8, max: 50 })
+    .withMessage("Password must be between 8 and 50 characters long")
+    .matches(/[A-Z]/)
+    .withMessage("Password must contain at least one uppercase letter")
+    .matches(/[a-z]/)
+    .withMessage("Password must contain at least one lowercase letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain at least one number"),
   body("confirm")
-    .trim()
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
     .custom((value, { req }) => value === req.body.password)
@@ -36,12 +40,11 @@ const validator = [
 const loginValidator = [
   body("username")
     .trim()
-    .isLength({ max: 25 })
-    .withMessage("username must be less than 25 characters long"),
+    .isLength({ min: 1, max: 25 })
+    .withMessage("Username must be between 1 and 25 characters long"),
   body("password")
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Password must not be more than 50 characters long"),
+    .isLength({ min: 1, max: 50 })
+    .withMessage("Password must be between 1 and 50 characters long"),
 ];
 
 function createAccessToken(user) {
@@ -56,24 +59,18 @@ function createRefreshToken(user) {
   });
 }
 
-// Verify token
 exports.verifyToken = (req, res, next) => {
-  // Get auth header value
   const bearerHeader = req.headers["authorization"];
-  if (bearerHeader) {
-    const token = bearerHeader.split(" ")[1];
-    // set token
-    let isValid = false;
-    jwt.verify(token, process.env.ACCESS_SECRET, (err, authData) => {
-      if (err) return res.sendStatus(401);
-      else {
-        isValid = true;
-        req.user = authData.user;
-      }
-    });
+  if (!bearerHeader) return res.sendStatus(401);
 
-    if (isValid) next();
-  } else {
+  const token = bearerHeader.split(" ")[1];
+  if (!token) return res.sendStatus(401);
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch {
     return res.sendStatus(401);
   }
 };
@@ -89,13 +86,9 @@ exports.signup = [
   validator,
   async (req, res) => {
     let errors = validationResult(req);
-
     if (!errors.isEmpty()) {
-      //TODO: Test this
-      errors = errors.array().map((err) => {
-        return err.msg;
-      });
-      return res.status(400).json({ errors: errors });
+      errors = errors.array().map((err) => err.msg);
+      return res.status(400).json({ errors });
     }
 
     const { name, username, password, profilePictureUrl } = req.body;
@@ -103,19 +96,24 @@ exports.signup = [
       return res
         .status(400)
         .json({ errors: ["Profile picture URL is required"] });
-    const salt = await bcrypt.genSalt();
-    const hashed = await bcrypt.hash(password, salt);
-    const userCreated = await queries.createUser(
-      name,
-      username,
-      hashed,
-      profilePictureUrl,
-    );
-    if (!userCreated)
-      return res.status(409).json({ errors: ["Username already Taken"] });
-    const user = await queries.getUserByName(username);
-    const { password: pass, tokens, ...safeUser } = user; // Remove password from user object before sending
-    return res.status(201).json(safeUser);
+
+    try {
+      const salt = await bcrypt.genSalt();
+      const hashed = await bcrypt.hash(password, salt);
+      const userCreated = await queries.createUser(
+        name,
+        username,
+        hashed,
+        profilePictureUrl,
+      );
+      if (!userCreated)
+        return res.status(409).json({ errors: ["Username already taken"] });
+      const user = await queries.getUserByName(username);
+      const { password: pass, tokens, ...safeUser } = user;
+      return res.status(201).json(safeUser);
+    } catch {
+      return res.status(500).json({ errors: ["Error creating account"] });
+    }
   },
 ];
 
@@ -123,66 +121,96 @@ exports.login = [
   loginValidator,
   async (req, res) => {
     let errors = validationResult(req);
-
     if (!errors.isEmpty()) {
-      //TODO: Test this
-      errors = errors.array().map((err) => {
-        return err.msg;
+      errors = errors.array().map((err) => err.msg);
+      return res.status(400).json({ errors });
+    }
+
+    try {
+      const { username, password } = req.body;
+      const user = await queries.getUserByName(username);
+      let isPasswordCorrect = false;
+      if (user)
+        isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (!(user && isPasswordCorrect)) {
+        return res
+          .status(401)
+          .json({ errors: ["Invalid username or password"] });
+      }
+      const { password: pass, tokens, ...safeUser } = user;
+
+      const token = createAccessToken(safeUser);
+      const refresh = createRefreshToken(safeUser);
+      const refreshHash = hashToken(refresh);
+      await queries.saveRefreshToken(
+        refreshHash,
+        safeUser.id,
+        new Date(Date.now() + 7 * 24 * 3600 * 1000),
+      );
+      res.cookie("refreshToken", refresh, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
       });
-      return res.status(400).json({ errors: errors });
+      res.status(200).json({ token });
+    } catch {
+      return res.status(500).json({ errors: ["Error logging in"] });
     }
-
-    const { username, password } = req.body;
-    const user = await queries.getUserByName(username);
-    let isPasswordCorrect = false;
-    if (user) isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!(user && isPasswordCorrect)) {
-      return res.status(401).json({ errors: ["invalid username or password"] });
-    }
-    const { password: pass, tokens, ...safeUser } = user; // Remove password from user object before sending
-
-    const token = createAccessToken(safeUser);
-    const refresh = createRefreshToken(safeUser);
-    const refreshHash = hashToken(refresh);
-    await queries.saveRefreshToken(
-      refreshHash,
-      safeUser.id,
-      new Date(Date.now() + 7 * 24 * 3600 * 1000),
-    ); // 7d
-    res.cookie("refreshToken", refresh, {
-      httpOnly: true,
-      sameSite: true,
-      secure: true,
-    });
-    res.status(200).json({ token });
   },
 ];
 
 exports.refresh = async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.sendStatus(401);
-  const hashed = hashToken(token);
-  const stored = await queries.getToken(hashed);
-  if (!stored || stored.revoked) return res.sendStatus(401);
-  const { user } = stored;
-  const { password: pass, tokens, ...safeUser } = user;
-  jwt.verify(token, process.env.REFRESH_SECRET, async (err, payload) => {
-    if (err) return res.sendStatus(401);
 
-    const newAccessToken = createAccessToken(safeUser);
-    res.json({ token: newAccessToken });
-  });
+  try {
+    const hashed = hashToken(token);
+    const stored = await queries.getToken(hashed);
+    if (!stored || stored.revoked) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.REFRESH_SECRET, async (err) => {
+      if (err) return res.sendStatus(401);
+
+      const { user } = stored;
+      const { password: pass, tokens, ...safeUser } = user;
+
+      await queries.revokeToken(hashed);
+
+      const newAccessToken = createAccessToken(safeUser);
+      const newRefresh = createRefreshToken(safeUser);
+      const newRefreshHash = hashToken(newRefresh);
+      await queries.saveRefreshToken(
+        newRefreshHash,
+        safeUser.id,
+        new Date(Date.now() + 7 * 24 * 3600 * 1000),
+      );
+      res.cookie("refreshToken", newRefresh, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
+      });
+      res.json({ token: newAccessToken });
+    });
+  } catch {
+    return res.status(500).json({ errors: ["Error refreshing token"] });
+  }
 };
 
 exports.logout = [
-  this.verifyToken,
+  exports.verifyToken,
   async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    const token = req.cookies.refreshToken;
-    const hashed = hashToken(token);
 
-    await queries.revokeToken(hashed);
-    res.clearCookie("refreshToken");
-    res.sendStatus(204);
+    try {
+      const token = req.cookies.refreshToken;
+      if (token) {
+        const hashed = hashToken(token);
+        await queries.revokeToken(hashed);
+      }
+      res.clearCookie("refreshToken");
+      res.sendStatus(204);
+    } catch {
+      return res.status(500).json({ errors: ["Error logging out"] });
+    }
   },
 ];

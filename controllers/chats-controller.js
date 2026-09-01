@@ -63,17 +63,18 @@ exports.getChat = [
   async (req, res) => {
     const user = req.user;
     const id = +req.params.id;
-    const limit = +req.query.limit;
+    if (isNaN(id) || id <= 0) return res.sendStatus(400);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit, 10) || 50, 1),
+      100,
+    );
 
     try {
-      const chat = limit
-        ? await queries.getChat(id, limit)
-        : await queries.getChat(id);
+      const chat = await queries.getChat(id, limit);
       if (!chat) return res.sendStatus(404);
 
-      // Check if user is a participant in the chat
       const isParticipant = chat.participants.some((p) => p.id === user.id);
-      if (!isParticipant) return res.sendStatus(403); // Users can only access their own chats
+      if (!isParticipant) return res.sendStatus(403);
       return res.status(200).json({ chat });
     } catch (err) {
       return res.status(500).json({ errors: ["Error retrieving chat"] });
@@ -108,8 +109,15 @@ exports.getUnreadCount = [
   async (req, res) => {
     const user = req.user;
     const id = +req.params.id;
+    if (isNaN(id) || id <= 0) return res.sendStatus(400);
 
     try {
+      const chat = await queries.getChat(id);
+      if (!chat) return res.sendStatus(404);
+
+      const isParticipant = chat.participants.some((p) => p.id === user.id);
+      if (!isParticipant) return res.sendStatus(403);
+
       const unreadCount = await queries.unreadMessagesCount(id, user.id);
       return res.status(200).json({ unreadCount });
     } catch (err) {
@@ -125,7 +133,15 @@ exports.leaveChat = [
   async (req, res) => {
     const user = req.user;
     const id = +req.params.id;
+    if (isNaN(id) || id <= 0) return res.sendStatus(400);
+
     try {
+      const chat = await queries.getChat(id);
+      if (!chat) return res.sendStatus(404);
+
+      const isParticipant = chat.participants.some((p) => p.id === user.id);
+      if (!isParticipant) return res.sendStatus(403);
+
       await queries.removeChatParticipant(id, user.id);
       return res.sendStatus(200);
     } catch (err) {

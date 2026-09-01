@@ -15,9 +15,7 @@ function transformChat(chat, currentUserId) {
   const other = chat.participants?.find((p) => p.id !== currentUserId);
   return {
     id: chat.id,
-    name: chat.isGroup
-      ? chat.name || ""
-      : other?.name || chat.name || "",
+    name: chat.isGroup ? chat.name || "" : other?.name || chat.name || "",
     isGroup: chat.isGroup,
     participants: chat.participants || [],
     lastMessage: lastMessage?.content ?? null,
@@ -33,8 +31,14 @@ function Dashboard() {
   const navigate = useNavigate();
   const { chatId } = useParams();
   const { loading, error, get, post, put, patch, del } = useApi();
-  const { joinChat, leaveChat, sendMessage, sendTyping, onNewMessage, onUserTyping } =
-    useSocket();
+  const {
+    joinChat,
+    leaveChat,
+    sendMessage,
+    sendTyping,
+    onNewMessage,
+    onUserTyping,
+  } = useSocket();
 
   const [chats, setChats] = useState([]);
   const [messagesByChat, setMessagesByChat] = useState({});
@@ -46,6 +50,12 @@ function Dashboard() {
   const [toasts, setToasts] = useState([]);
 
   const typingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const addToast = useCallback((message) => {
     const id = Date.now();
@@ -114,7 +124,10 @@ function Dashboard() {
             name: "Unknown",
           },
         }));
-        setMessagesByChat((prev) => ({ ...prev, [selectedChatId]: transformed }));
+        setMessagesByChat((prev) => ({
+          ...prev,
+          [selectedChatId]: transformed,
+        }));
         setChats((prev) =>
           prev.map((c) =>
             c.id === selectedChatId
@@ -127,9 +140,7 @@ function Dashboard() {
       .finally(() => setLoadingMessages(false));
     patch(`/api/chats/${selectedChatId}/read`).catch(() => {});
     setChats((prev) =>
-      prev.map((c) =>
-        c.id === selectedChatId ? { ...c, unreadCount: 0 } : c,
-      ),
+      prev.map((c) => (c.id === selectedChatId ? { ...c, unreadCount: 0 } : c)),
     );
   }, [selectedChatId, get, patch]);
 
@@ -166,19 +177,22 @@ function Dashboard() {
       setMessagesByChat((prev) => {
         const existing = prev[msg.chatId] || [];
         if (existing.some((m) => m.id === msg.id)) return prev;
-        const sender =
-          chats
-            .find((c) => c.id === msg.chatId)
-            ?.participants?.find((p) => p.id === msg.senderId) || {
-            id: msg.senderId,
-            name: "Unknown",
+        const sender = chats
+          .find((c) => c.id === msg.chatId)
+          ?.participants?.find((p) => p.id === msg.senderId) || {
+          id: msg.senderId,
+          name: "Unknown",
         };
         const enriched = { ...msg, sender };
         return { ...prev, [msg.chatId]: [...existing, enriched] };
       });
       if (msg.chatId !== selectedChatId) {
         const chat = chats.find((c) => c.id === msg.chatId);
-        addToast(`${chat?.name || "Unknown chat"}: new message(s)`);
+        const chatName = chat?.name || "Unknown chat";
+        addToast(`${chatName}: new message(s)`);
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification(chatName, { body: "new message(s)" });
+        }
         setChats((prev) =>
           prev.map((c) =>
             c.id === msg.chatId
