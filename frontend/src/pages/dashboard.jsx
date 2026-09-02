@@ -174,6 +174,7 @@ function Dashboard() {
 
   useEffect(() => {
     const unsub = onNewMessage((msg) => {
+      if (msg.senderId === currentUserId) return;
       setMessagesByChat((prev) => {
         const existing = prev[msg.chatId] || [];
         if (existing.some((m) => m.id === msg.id)) return prev;
@@ -208,7 +209,7 @@ function Dashboard() {
       }
     });
     return unsub;
-  }, [onNewMessage, selectedChatId, chats, addToast]);
+    }, [onNewMessage, selectedChatId, chats, addToast, currentUserId]);
 
   useEffect(() => {
     const unsub = onUserTyping((data) => {
@@ -238,6 +239,7 @@ function Dashboard() {
   const handleSend = (content) => {
     if (!selectedChatId) return;
     const id = Date.now();
+    const timestamp = new Date().toISOString();
     setMessagesByChat((prev) => ({
       ...prev,
       [selectedChatId]: [
@@ -245,13 +247,20 @@ function Dashboard() {
         {
           id,
           content,
-          timestamp: new Date().toISOString(),
+          timestamp,
           read: false,
           senderId: currentUserId,
           sender: { id: currentUserId, name: user.name },
         },
       ],
     }));
+    setChats((prev) =>
+      prev.map((c) =>
+        c.id === selectedChatId
+          ? { ...c, lastMessage: content, lastMessageAt: timestamp }
+          : c,
+      ),
+    );
     sendMessage(selectedChatId, content).then((res) => {
       if (res?.error || res?.message) return;
       setMessagesByChat((prev) => ({

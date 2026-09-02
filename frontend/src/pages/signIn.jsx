@@ -69,7 +69,7 @@ function SignIn() {
           <input
             type="password"
             name="password"
-            value="guestpassword"
+            value="GuestPassword123"
             hidden
             readOnly
           />
