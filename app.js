@@ -14,6 +14,10 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use("/health", (req, res) => {
+  return res.sendStatus(200);
+});
+
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
@@ -43,9 +47,6 @@ app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/chats", chatRouter);
 app.use("/api/messages", messageRouter);
-app.use("/health", (req, res) => {
-  return res.sendStatus(200);
-});
 
 app.use((err, req, res, next) => {
   console.error(err);
