@@ -37,6 +37,7 @@ const authLimiter = rateLimit({
   message: { errors: ["Too many attempts, please try again later"] },
 });
 
+app.set("trust proxy", 1);
 app.use(generalLimiter);
 app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/users", userRouter);
