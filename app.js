@@ -14,10 +14,6 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use("/health", (req, res) => {
-  return res.sendStatus(200);
-});
-
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
@@ -43,6 +39,9 @@ const authLimiter = rateLimit({
 
 app.set("trust proxy", 1);
 app.use(generalLimiter);
+app.use("/health", (req, res) => {
+  return res.sendStatus(200);
+});
 app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/chats", chatRouter);
