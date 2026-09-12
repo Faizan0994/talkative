@@ -133,41 +133,43 @@ function Settings() {
           </div>
         </form>
 
-        <div className="settings-danger">
-          <h3 className="settings-danger-title">Danger zone</h3>
-          {deleteError && (
-            <div className="settings-error">{deleteError}</div>
-          )}
-          {confirmingDelete ? (
-            <div className="settings-confirm">
-              <p className="settings-confirm-text">
-                This will permanently delete your account. Continue?
-              </p>
-              <div className="settings-confirm-actions">
-                <button
-                  className="settings-confirm-delete"
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                >
-                  {deleting ? "Deleting..." : "Delete account"}
-                </button>
-                <button
-                  className="settings-confirm-cancel"
-                  onClick={() => setConfirmingDelete(false)}
-                >
-                  Cancel
-                </button>
+        {user?.username !== "guest" && (
+          <div className="settings-danger">
+            <h3 className="settings-danger-title">Danger zone</h3>
+            {deleteError && (
+              <div className="settings-error">{deleteError}</div>
+            )}
+            {confirmingDelete ? (
+              <div className="settings-confirm">
+                <p className="settings-confirm-text">
+                  This will permanently delete your account. Continue?
+                </p>
+                <div className="settings-confirm-actions">
+                  <button
+                    className="settings-confirm-delete"
+                    onClick={handleDeleteAccount}
+                    disabled={deleting}
+                  >
+                    {deleting ? "Deleting..." : "Delete account"}
+                  </button>
+                  <button
+                    className="settings-confirm-cancel"
+                    onClick={() => setConfirmingDelete(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <button
-              className="settings-delete"
-              onClick={() => setConfirmingDelete(true)}
-            >
-              Delete account
-            </button>
-          )}
-        </div>
+            ) : (
+              <button
+                className="settings-delete"
+                onClick={() => setConfirmingDelete(true)}
+              >
+                Delete account
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

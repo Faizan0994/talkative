@@ -92,6 +92,9 @@ exports.deleteUser = [
   verifyToken,
   async (req, res) => {
     const user = req.user; // Only allow user to delete their own profile, not anyone else's
+    if (user.username === "guest") {
+      return res.status(403).json({ errors: ["Guest account cannot be deleted"] });
+    }
     try {
       await queries.deleteUser(user.id);
     } catch (err) {
